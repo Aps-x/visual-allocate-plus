@@ -1,0 +1,319 @@
+/* ==========================================================================
+Abstract
+========================================================================== */
+:root {
+  --clr-white: hsl(0, 0%, 100%);
+  --clr-black: hsl(260, 7%, 8%);
+  --clr-primary: ;
+  --clr-secondary: ;
+  --clr-txt-base: var(--clr-black);
+  --clr-accent: var(--clr-white);
+  --ff-regular: "", sans-serif;
+  --ff-accent: "", serif;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semi-bold: 600;
+  --fw-bold: 700;
+  --fw-extra-bold: 800;
+  --fs-extra-small: clamp(0.7813rem, 0.7747rem + 0.0326vw, 0.8rem);
+  --fs-small: clamp(0.9375rem, 0.9158rem + 0.1087vw, 1rem);
+  --fs-regular: clamp(1.125rem, 1.0815rem + 0.2174vw, 1.25rem);
+  --fs-semi-medium: clamp(1.35rem, 1.2761rem + 0.3696vw, 1.5625rem);
+  --fs-medium: clamp(1.62rem, 1.5041rem + 0.5793vw, 1.9531rem);
+  --fs-extra-medium: clamp(1.944rem, 1.771rem + 0.8651vw, 2.4414rem);
+  --fs-semi-large: clamp(2.3328rem, 2.0827rem + 1.2504vw, 3.0518rem);
+  --fs-large: clamp(3.3592rem, 2.8691rem + 2.4507vw, 4.7684rem);
+  --fs-extra-large: clamp(3.3592rem, 2.8691rem + 2.4507vw, 4.7684rem);
+}
+
+/* ==========================================================================
+Base
+========================================================================== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--ff-regular);
+  font-size: var(--fs-regular);
+  font-weight: var(--fw-regular);
+  color: var(--clr-txt-base);
+  background-color: var(--clr-secondary);
+  line-height: 1.4;
+  text-rendering: optimizeSpeed;
+  min-height: 100vh;
+}
+
+img, picture, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+  vertical-align: middle;
+  font-style: italic;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  text-wrap: balance;
+  line-height: 1.1;
+}
+
+p {
+  overflow-wrap: break-word;
+}
+
+a {
+  text-decoration: none;
+  color: unset;
+}
+
+a:hover {
+  color: var(--clr-accent);
+}
+
+input {
+  accent-color: var(--clr-accent);
+}
+
+*:focus-visible {
+  outline: 4px solid var(--clr-accent);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* ==========================================================================
+Components
+========================================================================== */
+.timetable {
+  width: 100%;
+}
+.timetable__body {
+  display: grid;
+  grid-template-columns: 150px repeat(5, 1fr);
+}
+.timetable__column {
+  --row-height: 125px;
+  position: relative;
+  display: grid;
+  grid-auto-flow: column dense;
+  grid-auto-columns: minmax(0, 1fr);
+  grid-template-rows: repeat(26, var(--row-height));
+  background: repeating-linear-gradient(to bottom, white 0, white var(--row-height), gray var(--row-height), gray calc(var(--row-height) * 2));
+}
+.timetable__column:not(:last-child) {
+  border-right: 1px solid black;
+}
+.timetable__column-heading {
+  position: absolute;
+  width: 100%;
+  height: var(--row-height);
+  line-height: var(--row-height);
+  margin-top: calc(1ex - 1cap);
+  font-size: 1.5rem;
+}
+.timetable__row-heading {
+  place-content: center;
+  font-size: 1.25rem;
+}
+
+.card {
+  color: white;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  font-size: 1.5rem;
+  border-radius: 6px;
+  padding: 5%;
+  word-break: break-all;
+}
+
+/* ==========================================================================
+Pages
+========================================================================== */
+/* ==========================================================================
+Layout
+========================================================================== */
+.content-column {
+  width: min(var(--max-width, 1000px), 100% - var(--gutter, 2rem) * 2);
+  margin-inline: auto;
+}
+
+.even-columns {
+  display: grid;
+  gap: 1rem;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+}
+
+.grid-auto-fit {
+  display: grid;
+  grid-gap: var(--gap, 1rem);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--min, 15ch)), 1fr));
+}
+
+.grid-auto-fill {
+  display: grid;
+  grid-gap: var(--gap, 1rem);
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--min, 15ch)), 1fr));
+}
+
+.flexbox-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap, 1rem);
+}
+
+.flexbox-grid > * {
+  flex: 1 1 var(--min, auto);
+}
+
+.stack-layout {
+  display: grid;
+  grid-template-areas: "stack";
+}
+
+.stack-layout > * {
+  grid-area: stack;
+}
+
+.flow > *:where(:not(:first-child)) {
+  margin-top: var(--flow-spacer, 1em);
+}
+
+/* ==========================================================================
+Utility
+========================================================================== */
+.txt-center {
+  text-align: center;
+}
+
+.txt-left {
+  text-align: left;
+}
+
+.txt-right {
+  text-align: right;
+}
+
+.fs-extrasmall {
+  font-size: var(--fs-extra-small);
+}
+
+.fs-small {
+  font-size: var(--fs-small);
+}
+
+.fs-regular {
+  font-size: var(--fs-regular);
+}
+
+.fs-semimedium {
+  font-size: var(--fs-semi-medium);
+}
+
+.fs-medium {
+  font-size: var(--fs-medium);
+}
+
+.fs-extramedium {
+  font-size: var(--fs-extra-medium);
+}
+
+.fs-semilarge {
+  font-size: var(--fs-semi-large);
+}
+
+.fs-large {
+  font-size: var(--fs-large);
+}
+
+.fs-extralarge {
+  font-size: var(--fs-extra-large);
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.fw-regular {
+  font-weight: var(--fw-regular);
+}
+
+.fw-bold {
+  font-weight: var(--fw-bold);
+}
+
+.ff-accent {
+  font-family: var(--ff-accent);
+}
+
+.order-first {
+  order: -1;
+}
+
+.order-last {
+  order: 999;
+}
+
+.is-hidden {
+  display: none;
+}
+
+.block {
+  display: block;
+}
+
+.inline-block {
+  display: inline-block;
+}
+
+.inline {
+  display: inline;
+}
+
+.my-auto {
+  margin-inline: auto;
+}
+
+.mx-auto {
+  margin-block: auto;
+}
+
+.ml-auto {
+  margin-left: auto;
+}
+
+.mr-auto {
+  margin-right: auto;
+}
+
+.min-auto {
+  --min: auto;
+}/*# sourceMappingURL=style.css.map */
