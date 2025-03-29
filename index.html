@@ -4,104 +4,208 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Document</title>
+    <title>Visual Allocate+</title>
 
     <link rel="stylesheet" href="css/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">    
+    
     <script src="js/random_sort.js" defer></script>
+    <script src="js/accordion.js" defer></script>
 </head>
 <body>
-    <header>
-        <h1>UC Timetable</h1>
+    <header class="header">
+        <h1 class="header__title">Visual Allocate+</h1>
     </header>
 
     <main>
-        <table class="timetable">
-            <tbody class="timetable__body">
-                <!-- Rows are rearranged to be columns -->
-                <tr class="timetable__column">
-                    <td></td>
-                    <th class="timetable__row-heading">7:00AM</th>
-                    <th class="timetable__row-heading">7:30AM</th>
-                    <th class="timetable__row-heading">8:00AM</th>
-                </tr>
+        <svg class="sea" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g>
+                <use class="sea__wave" xlink:href="#gentle-wave" x="48" y="0" fill="hsla(214, 95%, 42%, 0.7)" />
+                <use class="sea__wave" xlink:href="#gentle-wave" x="48" y="3" fill="hsla(214, 95%, 42%, 0.5)" />
+                <use class="sea__wave" xlink:href="#gentle-wave" x="48" y="5" fill="hsla(214, 95%, 42%, 0.3)" />
+                <use class="sea__wave" xlink:href="#gentle-wave" x="48" y="7" fill="hsla(214, 95%, 42%, 1)" />
+            </g>
+        </svg>
+
+        <section class="bg-blue clr-white py-10">
+            <div class="content-column">
+                <div class="grid-auto-fit" style="--min: 500px; --gap: 5rem;">
+                    <form class="form | flow" style="--flow-spacer: 2.5rem;">
+                        <h2 class="form__title">Activity</h2>
+
+                        <div class="form__group">
+                            <label class="form__label" for="activity_name">Activity name</label>
+                            <input class="form__input | form__input--text" type="text" name="activity_name" id="activity_name">
+                        </div>
+
+                        <div class="form__group">
+                            <label class="form__label" for="activity_details">Copy/Paste Activity details here</label>
+                            <textarea class="form__input | form__input--textarea" name="activity_details" id="activity_details"></textarea>
+                        </div>
+
+                        <button>Submit</button>
+                    </form>
+        
+                    <article class="article">
+                        <h2 class="article__title">Help</h2>
+                        <div class="accordion">
+                            <article class="accordion__panel">
+                                <h3 class="accordion__header">
+                                    <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="sect1" id="accordion1">
+                                        <span>How do I add an activity?</span>
+                                        <img class="accordion__arrow" src="img/icon-arrow.svg" alt="">
+                                    </button>
+                                </h3>
+                                <div class="accordion__content" id="sect1" role="region" aria-labelledby="accordion1" aria-hidden="true">
+                                    <div>
+                                        <h3 class="clr-blue fw-bold">Step-By-Step Guide</h3>
+                                        <ol class="article__list">
+                                            <li class="article__list-item">Go to your timetable on the Allocate+ website</li>
+                                            <li class="article__list-item">On the left hand side, click on a tutorial or lecture link</li>
+                                            <li class="article__list-item">You will see a table with the activity details, select the entire table and copy it (demo below)</li>
+                                            <li class="article__list-item">Paste the activity information into the input box</li>
+                                            <li class="article__list-item">Add a name for the activity and press the submit button</li>
+                                        </ol>
+                                        <div class="article__demo-container">
+                                            <img src="img/demo.gif" alt="Visual demonstration of the Step-By-Step guide above">
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <img class="section-transition" src="img/wave.svg" alt="">
+
+        <section>
+            <h2 class="visually-hidden">Timetable</h2>
+            <table class="timetable">
+                <tbody class="timetable__body">
+                    <!-- Rows are rearranged to be columns -->
     
-                <tr class="timetable__column">
-                    <th class="timetable__column-heading">Monday</th>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-                </tr>
+                    <tr class="timetable__column">
+                        <td></td>
+                        <th class="timetable__row-heading">7:00 AM</th>
+                        <th class="timetable__row-heading">7:30 AM</th>
+                        <th class="timetable__row-heading">8:00 AM</th>
+                        <th class="timetable__row-heading">8:30 AM</th>
+                        <th class="timetable__row-heading">9:00 AM</th>
+                        <th class="timetable__row-heading">9:30 AM</th>
+                        <th class="timetable__row-heading">10:00 AM</th>
+                        <th class="timetable__row-heading">10:30 AM</th>
+                        <th class="timetable__row-heading">11:00 AM</th>
+                        <th class="timetable__row-heading">11:30 AM</th>
+                        <th class="timetable__row-heading">12:00 PM</th>
+                        <th class="timetable__row-heading">12:30 PM</th>
+                        <th class="timetable__row-heading">1:00 PM</th>
+                        <th class="timetable__row-heading">1:30 PM</th>
+                        <th class="timetable__row-heading">2:00 PM</th>
+                        <th class="timetable__row-heading">2:30 PM</th>
+                        <th class="timetable__row-heading">3:00 PM</th>
+                        <th class="timetable__row-heading">3:30 PM</th>
+                        <th class="timetable__row-heading">4:00 PM</th>
+                        <th class="timetable__row-heading">4:30 PM</th>
+                        <th class="timetable__row-heading">5:00 PM</th>
+                        <th class="timetable__row-heading">5:30 PM</th>
+                        <th class="timetable__row-heading">6:00 PM</th>
+                        <th class="timetable__row-heading">6:30 PM</th>
+                        <th class="timetable__row-heading">7:00 PM</th>
+                        <th class="timetable__row-heading">7:30 PM</th>
+                        <th class="timetable__row-heading">8:00 PM</th>
+                        <th class="timetable__row-heading">8:30 PM</th>
+                        <th class="timetable__row-heading">9:00 PM</th>
+                        <th class="timetable__row-heading">9:30 PM</th>
+                    </tr>
     
-                <tr class="timetable__column">
-                    <th class="timetable__column-heading">Tuesday</th>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-                </tr>
+                    <tr class="timetable__column" id="Monday">
+                        <th class="timetable__column-heading">Monday</th>
     
-                <tr class="timetable__column">
-                    <th class="timetable__column-heading">Wednesday</th>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-                </tr>
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
     
-                <tr class="timetable__column">
-                    <th class="timetable__column-heading">Thursday</th>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-                </tr>
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
     
-                <tr class="timetable__column">
-                    <th class="timetable__column-heading">Friday</th>
-
-                    <td class="card">
-                        <article class="card__article">
-                            <h3>Testing 123</h3>
-                        </article>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+                    </tr>
+    
+                    <tr class="timetable__column" id="Tuesday">
+                        <th class="timetable__column-heading">Tuesday</th>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+                    </tr>
+        
+                    <tr class="timetable__column" id="Wednesday">
+                        <th class="timetable__column-heading">Wednesday</th>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+                    </tr>
+        
+                    <tr class="timetable__column" id="Thursday">
+                        <th class="timetable__column-heading">Thursday</th>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+                    </tr>
+        
+                    <tr class="timetable__column" id="Friday">
+                        <th class="timetable__column-heading">Friday</th>
+    
+                        <td class="card">
+                            <article class="card__article">
+                                <h3>Testing 123</h3>
+                            </article>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
     </main>
 
-    <footer></footer>
+    <footer>
+
+    </footer>
 </body>
 </html>
