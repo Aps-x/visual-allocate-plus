@@ -1,6 +1,6 @@
-const accordion = document.querySelector(".accordion");
+const ACCORDION = document.querySelector(".accordion");
 
-accordion.addEventListener("click", (e) => {
+ACCORDION.addEventListener("click", (e) => {
     const activePanel = e.target.closest(".accordion__panel");
     if (!activePanel) return;
     toggleAccordion(activePanel);
