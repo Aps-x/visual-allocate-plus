@@ -14,8 +14,9 @@
     
     <script src="js/random_sort.js" defer></script>
     <script src="js/accordion.js" defer></script>
+    <script src="js/app.js" defer></script>
 </head>
-<body>
+<body id="root">
     <header class="header">
         <h1 class="header__title">Visual Allocate+</h1>
     </header>
@@ -133,75 +134,37 @@
                     <tr class="timetable__column" id="Monday">
                         <th class="timetable__column-heading">Monday</th>
     
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
+                        <td class="activity" data-id="1"><article class="activity__card" data-id="1" draggable="true"><h3>Testing 123</h3></article></td>
+
+                        <td class="activity" data-id="2"><article class="activity__card" data-id="2" draggable="true"><h3>Testing 123</h3></article></td>
                     </tr>
     
                     <tr class="timetable__column" id="Tuesday">
                         <th class="timetable__column-heading">Tuesday</th>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
+
+                        <td class="activity" data-id="1"></td>
+
+                        <td class="activity" data-id="1"></td>
+
+                        <td class="activity" data-id="1"></td>
+
+                        <td class="activity" data-id="2"></td>
                     </tr>
         
                     <tr class="timetable__column" id="Wednesday">
                         <th class="timetable__column-heading">Wednesday</th>
-    
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
+                        
+                        <td class="activity" data-id="1"></td>
                     </tr>
         
                     <tr class="timetable__column" id="Thursday">
                         <th class="timetable__column-heading">Thursday</th>
     
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
                     </tr>
         
                     <tr class="timetable__column" id="Friday">
                         <th class="timetable__column-heading">Friday</th>
     
-                        <td class="card">
-                            <article class="card__article">
-                                <h3>Testing 123</h3>
-                            </article>
-                        </td>
                     </tr>
                 </tbody>
             </table>

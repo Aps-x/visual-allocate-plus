@@ -7,7 +7,7 @@ Abstract
     --clr-black:      hsl(0, 0%, 0%);
     --clr-purple:     hsl(300, 100%, 25%);
     --clr-blue-light: hsl(214, 100%, 71%);
-    --clr-blue:       hsl(214, 95%, 42%);
+    --clr-blue:       rgb(5, 94, 209);
     --clr-grey:       hsl(0, 0%, 85%);
     --clr-grey-light: hsl(0, 0%, 96%);
     --clr-navy:       hsl(213, 45%, 24%);
@@ -47,7 +47,25 @@ Abstract
     --link-clr: var(--clr-black);
     --link-clr-hover: var(--clr-accent);
 
-    --focus-clr: var(--clr-accent);
+    --shadow-color: 214deg 100% 23%;
+        --shadow-elevation-low:
+            0.4px 0.3px 0.6px hsl(var(--shadow-color) / 0.34),
+            0.6px 0.6px 1px -1.2px hsl(var(--shadow-color) / 0.34),
+            1.5px 1.4px 2.3px -2.5px hsl(var(--shadow-color) / 0.34);
+        --shadow-elevation-medium:
+            0.4px 0.3px 0.6px hsl(var(--shadow-color) / 0.36),
+            1.2px 1.1px 1.8px -0.8px hsl(var(--shadow-color) / 0.36),
+            3.1px 2.9px 4.8px -1.7px hsl(var(--shadow-color) / 0.36),
+            7.6px 6.9px 11.5px -2.5px hsl(var(--shadow-color) / 0.36);
+        --shadow-elevation-high:
+            0.4px 0.3px 0.6px hsl(var(--shadow-color) / 0.34),
+            2.2px 2px 3.3px -0.4px hsl(var(--shadow-color) / 0.34),
+            4.1px 3.8px 6.3px -0.7px hsl(var(--shadow-color) / 0.34),
+            6.8px 6.2px 10.4px -1.1px hsl(var(--shadow-color) / 0.34),
+            10.8px 9.9px 16.5px -1.4px hsl(var(--shadow-color) / 0.34),
+            17px 15.5px 25.9px -1.8px hsl(var(--shadow-color) / 0.34),
+            25.8px 23.6px 39.3px -2.1px hsl(var(--shadow-color) / 0.34),
+            38px 34.7px 57.9px -2.5px hsl(var(--shadow-color) / 0.34);
 }
     // Breakpoints
     $breakpoint-desktop-small: 992px;
@@ -102,9 +120,6 @@ a {
 }
 a:hover {
     color: var(--link-clr-hover);
-}
-*:focus-visible {
-    outline: 4px solid var(--focus-clr);
 }
 :target {
     scroll-padding-block-start: 2rem;
@@ -196,6 +211,7 @@ Components
         margin-top: 0.5rem;
         padding: 0.5rem;
         background-color: var(--clr-white);
+        box-shadow: var(--shadow-elevation-medium);
         &--textarea {
             display: block;
             resize: none;
@@ -301,6 +317,7 @@ Components
 }
 .accordion {
     margin-top: 4rem;
+    box-shadow: var(--shadow-elevation-medium);
     &__panel {
         background: var(--clr-white);
         border-radius: 6px;
@@ -360,8 +377,6 @@ Components
         grid-auto-flow: column dense;
         grid-auto-columns: minmax(0, 1fr);
         grid-template-rows: repeat(var(--row-count), var(--row-height));
-        
-        column-gap: 2.5%;
         padding-inline: 5px;
         background:
         repeating-linear-gradient(
@@ -392,13 +407,34 @@ Components
         font-size: var(--fs-regular);
     }
 }
-.card {
-    color: white;
-    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-    font-size: var(--fs-regular);
-    border-radius: 6px;
-    padding: 5%;
-    word-break: break-all;
+.activity {
+    padding: 2.5%;
+    &:empty {
+        display: none;
+    }
+    &--dropzone {
+        height: 100%;
+        background-color: var(--clr-blue-light);
+        border-radius: 6px;
+    }
+    &.activity--dropzone {
+        display: block;
+    }
+    &__card {
+        color: white;
+        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+        font-size: var(--fs-regular);
+        border-radius: 6px;
+        padding: 5%;
+        height: 100%;
+        word-break: break-all;
+        &:hover {
+            cursor: grab;
+        }
+        &:active {
+            cursor: grabbing;
+        }
+    }
 }
 .icon {
     display: inline-block;
