@@ -10,10 +10,11 @@ INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSI
 let card_being_dragged = null;
 let current_activity_id = null;
 
-let offsetX = 0;
-let offsetY = 0;
+let original_container = null;
+let dropped_in_valid_zone = false;
 
-let originalStyles = {};
+let offset_x = 0;
+let offset_y = 0;
 
 /* ==========================================================================
 Event Listeners
@@ -21,50 +22,34 @@ Event Listeners
 CARDS.forEach(card => {
     card.addEventListener("dragstart", (event) => {
         card_being_dragged = card;
-        current_activity_id = card.dataset.activityId;
-        //card.classList.add("activity__card--being-dragged");
+        current_activity_id = card_being_dragged.dataset.activityId;
+        original_container = card.parentElement;
+        dropped_in_valid_zone = false;
 
-        // Offset the card position when being dragged
-        // Based on where the user clicks the card
-        const rect = card.getBoundingClientRect();
-        offsetX = event.clientX - rect.left;
-        offsetY = event.clientY - rect.top;
+        // Offset the card position when being dragged...
+        // Based on where the user clicks the card.
+        const rect = card_being_dragged.getBoundingClientRect();
+        offset_x = event.clientX - rect.left;
+        offset_y = event.clientY - rect.top;
+        
+        // Card width is set by the grid-parent auto-columns.
+        // Card height and padding are percentage based for responsiveness.
+        // This introduces a problem when the card is moved to the body...
+        // Because percentage is relative to the container.
+        // Convert relative percentage values => absolute pixel values.
+        const card_computed_style = window.getComputedStyle(card_being_dragged);
+        const card_padding = Get_Padding_As_Pixels(card_computed_style);
 
-        // Save original styles to reset later
-        const computed = window.getComputedStyle(card);
-        originalStyles = {
-            position: card.style.position,
-            left: card.style.left,
-            top: card.style.top,
-            width: card.style.width,
-            height: card.style.height,
-            padding: card.style.padding,
-            zIndex: card.style.zIndex,
-            pointerEvents: card.style.pointerEvents,
-        };
+        card_being_dragged.style.setProperty('--width', card_computed_style.width);
+        card_being_dragged.style.setProperty('--height', card_computed_style.height);
+        card_being_dragged.style.setProperty('--padding', card_padding);
+        
+        // IMPORANT: Must be added after computing the style
+        card_being_dragged.classList.add("activity__card--being-dragged");
 
-        // Calculate the padding in px (to avoid issues with percentage padding)
-        const paddingTop = parseFloat(computed.paddingTop);
-        const paddingRight = parseFloat(computed.paddingRight);
-        const paddingBottom = parseFloat(computed.paddingBottom);
-        const paddingLeft = parseFloat(computed.paddingLeft);
-
-        // Set fixed dimensions and absolute position
-        card.style.width = computed.width;
-        card.style.height = computed.height;
-        card.style.paddingTop = `${paddingTop}px`;
-        card.style.paddingRight = `${paddingRight}px`;
-        card.style.paddingBottom = `${paddingBottom}px`;
-        card.style.paddingLeft = `${paddingLeft}px`;
-        card.style.position = "absolute";
-        card.style.zIndex = "9999";
-        card.style.pointerEvents = "none"; // prevents re-capturing
-        card.style.margin = "0";
-        card.style.boxSizing = "border-box";
-
-        // Move it to the body
+        // Move card to the body
         document.body.appendChild(card);
-        moveCard(event.pageX, event.pageY);
+        Move_Card(event.pageX, event.pageY);
 
         // Hide native drag image
         event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
@@ -78,53 +63,75 @@ CARDS.forEach(card => {
     });
 
     card.addEventListener("dragend", () => {
-        if (card_being_dragged) {
-            // Reset styles
-            Object.assign(card_being_dragged.style, originalStyles);
-
-            // Remove dropzone classes
-            document.querySelectorAll(".activity--dropzone")
-                .forEach(cell => cell.classList.remove("activity--dropzone"));
-
-            card_being_dragged = null;
-            current_activity_id = null;
+        // If the card wasn't dropped in a valid zone, return it to original container
+        if (!dropped_in_valid_zone) {
+            original_container.appendChild(card_being_dragged);
         }
+
+        card_being_dragged.classList.remove("activity__card--being-dragged");
+
+        // Remove dropzone classes
+        ACTIVITIES.forEach(activity => {
+            activity.classList.remove("activity--dropzone");
+        });
+
+        // Reset global references
+        card_being_dragged = null;
+        current_activity_id = null;
+        original_container = null;
+        dropped_in_valid_zone = false;
     });
 });
 
-document.addEventListener("dragover", (e) => {
+// When the card is dragged over the page, update position
+document.addEventListener("dragover", (event) => {
     if (card_being_dragged) {
-        moveCard(e.pageX, e.pageY);
+        Move_Card(event.pageX, event.pageY);
     }
 });
 
-ACTIVITIES.forEach(cell => {
-    cell.addEventListener("dragover", (e) => {
-        e.preventDefault(); // Allow drop
+ACTIVITIES.forEach(activity => {
+    activity.addEventListener("dragover", (event) => {
+        // Make sure the drop event is not ignored
+        event.preventDefault();
     });
 
-    cell.addEventListener("drop", () => {
-        if (card_being_dragged && cell.dataset.activityId === current_activity_id) {
-            cell.appendChild(card_being_dragged);
+    activity.addEventListener("drop", () => {
+        if (card_being_dragged && activity.dataset.activityId === current_activity_id) {
+            activity.appendChild(card_being_dragged);
+            dropped_in_valid_zone = true;
         }
 
-        // Clean up
-        document.querySelectorAll(".activity--dropzone")
-            .forEach(c => c.classList.remove("activity--dropzone"));
+        // Remove dropzone classes
+        ACTIVITIES.forEach(activity => {
+            activity.classList.remove("activity--dropzone");
+        });
 
         if (card_being_dragged) {
             // Reset styles
-            Object.assign(card_being_dragged.style, originalStyles);
-            card_being_dragged = null;
-            current_activity_id = null;
+            card_being_dragged.classList.remove("activity__card--being-dragged");
         }
+
+        // Reset handled in dragend
     });
 });
 
 /* ==========================================================================
 Functions
 ========================================================================== */
-function moveCard(pageX, pageY) {
-    card_being_dragged.style.left = `${pageX - offsetX}px`;
-    card_being_dragged.style.top = `${pageY - offsetY}px`;
+function Move_Card(page_x, page_y) {
+    card_being_dragged.style.setProperty('--left', `${page_x - offset_x}px`);
+    card_being_dragged.style.setProperty('--top', `${page_y - offset_y}px`);
+}
+
+function Get_Padding_As_Pixels(computed_style) {
+    // Padding should be even on all sides, original below
+    return computed_style.getPropertyValue('padding-left');
+
+    // const padding_top = computed_style.getPropertyValue('padding-top');
+    // const padding_right = computed_style.getPropertyValue('padding-right');
+    // const padding_bottom = computed_style.getPropertyValue('padding-bottom');
+    // const padding_left = computed_style.getPropertyValue('padding-left');
+
+    // return `${padding_top} ${padding_right} ${padding_bottom} ${padding_left}`;
 }
