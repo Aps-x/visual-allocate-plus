@@ -213,21 +213,21 @@ Components
   aspect-ratio: 100/25;
 }
 
-.article__title {
+.help__title {
   font-size: var(--fs-large);
   font-weight: var(--fw-medium);
 }
-.article__list {
+.help__list {
   list-style-position: inside;
 }
-.article__list-item {
+.help__list-item {
   margin-top: 1rem;
 }
-.article__list-item::marker {
+.help__list-item::marker {
   font-weight: var(--fw-bold);
   color: var(--clr-blue);
 }
-.article__demo-container {
+.help__demo-container {
   display: grid;
   place-content: center;
   height: 400px;

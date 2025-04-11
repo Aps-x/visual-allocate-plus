@@ -37,6 +37,7 @@
         <section class="bg-blue clr-white py-10">
             <div class="content-column">
                 <div class="grid-auto-fit" style="--min: 500px; --gap: 5rem;">
+
                     <form class="form | flow" style="--flow-spacer: 2.5rem;">
                         <h2 class="form__title">Activity</h2>
 
@@ -57,34 +58,39 @@
                         </button>
                     </form>
         
-                    <article class="article">
-                        <h2 class="article__title">Help</h2>
+                    <section class="help">
+                        <h2 class="help__title">Help</h2>
+
                         <div class="accordion">
                             <article class="accordion__panel">
+
                                 <h3 class="accordion__header">
                                     <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="sect1" id="accordion1">
                                         <span>How do I add an activity?</span>
                                         <img class="accordion__arrow" src="img/icon-arrow.svg" alt="">
                                     </button>
                                 </h3>
+                                
                                 <div class="accordion__content" id="sect1" role="region" aria-labelledby="accordion1" aria-hidden="true">
                                     <div>
-                                        <h3 class="clr-blue fw-bold">Step-By-Step Guide</h3>
-                                        <ol class="article__list">
-                                            <li class="article__list-item">Go to your timetable on the Allocate+ website</li>
-                                            <li class="article__list-item">On the left hand side, click on a tutorial or lecture link</li>
-                                            <li class="article__list-item">You will see a table with the activity details, select the entire table and copy it (demo below)</li>
-                                            <li class="article__list-item">Paste the activity information into the input box</li>
-                                            <li class="article__list-item">Add a name for the activity and press the submit button</li>
+                                        <h4 class="clr-blue fw-bold">Step-By-Step Guide</h4>
+
+                                        <ol class="help__list">
+                                            <li class="help__list-item">Go to your timetable on the Allocate+ website</li>
+                                            <li class="help__list-item">On the left hand side, click on a tutorial or lecture link</li>
+                                            <li class="help__list-item">You will see a table with the activity details, select the entire table and copy it (demo below)</li>
+                                            <li class="help__list-item">Paste the activity information into the input box</li>
+                                            <li class="help__list-item">Add a name for the activity and press the submit button</li>
                                         </ol>
-                                        <div class="article__demo-container">
-                                            <img src="img/demo.gif" alt="Visual demonstration of the Step-By-Step guide above">
+
+                                        <div class="help__demo-container">
+                                            <img src="img/demo.gif" alt="">
                                         </div>
                                     </div>
                                 </div>
                             </article>
                         </div>
-                    </article>
+                    </section>
                 </div>
             </div>
         </section>
