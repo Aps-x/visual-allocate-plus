@@ -1,97 +1,130 @@
-let draggedCard = null;
-let ghostCard = null;
+/* ==========================================================================
+Constants, Variables, Data
+========================================================================== */
+const ACTIVITIES = document.querySelectorAll(".activity");
+const CARDS = document.querySelectorAll(".activity__card");
+
+const INVISIBLE_IMAGE = new Image();
+INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
+
+let card_being_dragged = null;
+let current_activity_id = null;
+
 let offsetX = 0;
 let offsetY = 0;
-let currentDataId = null;
 
-const transparentImage = new Image();
-transparentImage.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
+let originalStyles = {};
 
-document.querySelectorAll(".activity__card").forEach(card => {
+/* ==========================================================================
+Event Listeners
+========================================================================== */
+CARDS.forEach(card => {
+    card.addEventListener("dragstart", (event) => {
+        card_being_dragged = card;
+        current_activity_id = card.dataset.activityId;
+        //card.classList.add("activity__card--being-dragged");
 
-    card.addEventListener("dragstart", (e) => {
-        draggedCard = card;
+        // Offset the card position when being dragged
+        // Based on where the user clicks the card
         const rect = card.getBoundingClientRect();
-        offsetX = e.clientX - rect.left;
-        offsetY = e.clientY - rect.top;
-        currentDataId = card.dataset.id;
-    
-        // Hide native drag image
-        e.dataTransfer.setDragImage(transparentImage, 0, 0);
-    
-        // Clone and style ghost card
-        ghostCard = card.cloneNode(true);
-        copyComputedStyles(card, ghostCard);
-        ghostCard.style.position = "absolute";
-        ghostCard.style.pointerEvents = "none";
-        ghostCard.style.opacity = "0.9";
-        ghostCard.style.zIndex = "9999";
-        ghostCard.style.margin = "0";
-        ghostCard.style.boxSizing = "border-box";
-        ghostCard.classList.add("activity__card--dragging-clone");
-        document.body.appendChild(ghostCard);
-        moveGhost(e.pageX, e.pageY);
+        offsetX = event.clientX - rect.left;
+        offsetY = event.clientY - rect.top;
 
-        // Hide original card visually
-        card.style.visibility = "hidden";
-    
-        // Highlight dropzones
-        document.querySelectorAll(`.activity[data-id="${currentDataId}"]`)
-            .forEach(cell => cell.classList.add("activity--dropzone"));
+        // Save original styles to reset later
+        const computed = window.getComputedStyle(card);
+        originalStyles = {
+            position: card.style.position,
+            left: card.style.left,
+            top: card.style.top,
+            width: card.style.width,
+            height: card.style.height,
+            padding: card.style.padding,
+            zIndex: card.style.zIndex,
+            pointerEvents: card.style.pointerEvents,
+        };
+
+        // Calculate the padding in px (to avoid issues with percentage padding)
+        const paddingTop = parseFloat(computed.paddingTop);
+        const paddingRight = parseFloat(computed.paddingRight);
+        const paddingBottom = parseFloat(computed.paddingBottom);
+        const paddingLeft = parseFloat(computed.paddingLeft);
+
+        // Set fixed dimensions and absolute position
+        card.style.width = computed.width;
+        card.style.height = computed.height;
+        card.style.paddingTop = `${paddingTop}px`;
+        card.style.paddingRight = `${paddingRight}px`;
+        card.style.paddingBottom = `${paddingBottom}px`;
+        card.style.paddingLeft = `${paddingLeft}px`;
+        card.style.position = "absolute";
+        card.style.zIndex = "9999";
+        card.style.pointerEvents = "none"; // prevents re-capturing
+        card.style.margin = "0";
+        card.style.boxSizing = "border-box";
+
+        // Move it to the body
+        document.body.appendChild(card);
+        moveCard(event.pageX, event.pageY);
+
+        // Hide native drag image
+        event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
+
+        // Highlight matching dropzones
+        ACTIVITIES.forEach(activity => {
+            if (activity.dataset.activityId === current_activity_id) {
+                activity.classList.add("activity--dropzone");
+            }
+        });
     });
-    
+
     card.addEventListener("dragend", () => {
-        // Show the original card again
-        card.style.visibility = "visible";
-    
-        if (ghostCard) {
-            ghostCard.remove();
-            ghostCard = null;
+        if (card_being_dragged) {
+            // Reset styles
+            Object.assign(card_being_dragged.style, originalStyles);
+
+            // Remove dropzone classes
+            document.querySelectorAll(".activity--dropzone")
+                .forEach(cell => cell.classList.remove("activity--dropzone"));
+
+            card_being_dragged = null;
+            current_activity_id = null;
         }
-    
-        document.querySelectorAll(".activity--dropzone")
-            .forEach(cell => cell.classList.remove("activity--dropzone"));
-    
-        draggedCard = null;
-        currentDataId = null;
     });
-    
 });
 
 document.addEventListener("dragover", (e) => {
-    if (ghostCard) {
-        moveGhost(e.pageX, e.pageY);
+    if (card_being_dragged) {
+        moveCard(e.pageX, e.pageY);
     }
 });
 
-document.querySelectorAll(".activity").forEach(cell => {
+ACTIVITIES.forEach(cell => {
     cell.addEventListener("dragover", (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Allow drop
     });
 
     cell.addEventListener("drop", () => {
-        if (draggedCard) {
-            cell.appendChild(draggedCard);
+        if (card_being_dragged && cell.dataset.activityId === current_activity_id) {
+            cell.appendChild(card_being_dragged);
         }
 
+        // Clean up
         document.querySelectorAll(".activity--dropzone")
             .forEach(c => c.classList.remove("activity--dropzone"));
 
-        if (ghostCard) {
-            ghostCard.remove();
-            ghostCard = null;
+        if (card_being_dragged) {
+            // Reset styles
+            Object.assign(card_being_dragged.style, originalStyles);
+            card_being_dragged = null;
+            current_activity_id = null;
         }
     });
 });
 
-function moveGhost(pageX, pageY) {
-    ghostCard.style.left = `${pageX - offsetX}px`;
-    ghostCard.style.top = `${pageY - offsetY}px`;
-}
-
-function copyComputedStyles(source, target) {
-    const computed = window.getComputedStyle(source);
-    for (let prop of computed) {
-        target.style.setProperty(prop, computed.getPropertyValue(prop), computed.getPropertyPriority(prop));
-    }
+/* ==========================================================================
+Functions
+========================================================================== */
+function moveCard(pageX, pageY) {
+    card_being_dragged.style.left = `${pageX - offsetX}px`;
+    card_being_dragged.style.top = `${pageY - offsetY}px`;
 }

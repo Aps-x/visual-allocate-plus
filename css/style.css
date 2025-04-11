@@ -407,8 +407,6 @@ Components
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
   font-size: var(--fs-regular);
   border-radius: 6px;
-  padding: 5%;
-  height: 100%;
   word-break: break-all;
 }
 .activity__card:hover {
@@ -416,6 +414,26 @@ Components
 }
 .activity__card:active {
   cursor: grabbing;
+}
+.activity__card:not(.activity__card--being-dragged) {
+  padding: 5%;
+  height: 100%;
+}
+.activity__card--being-dragged {
+  position: absolute;
+  z-index: 9999;
+  opacity: 0.9;
+  pointer-events: none;
+  --height: initial;
+  --width: initial;
+  --padding: initial;
+  --top: 0;
+  --left: 0;
+  top: var(--top);
+  left: var(--left);
+  height: var(--height);
+  width: var(--width);
+  padding: var(--padding);
 }
 
 .icon {
