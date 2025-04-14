@@ -358,8 +358,8 @@ Components
     }
 }
 .timetable {
-    --row-count: 31;
-    --row-height: 100px;
+    --_row-count: 31;
+    --_row-height: 100px;
     width: 100%;
     &__body {
         display: grid;
@@ -370,15 +370,15 @@ Components
         display: grid;
         grid-auto-flow: column dense;
         grid-auto-columns: minmax(0, 1fr);
-        grid-template-rows: repeat(var(--row-count), var(--row-height));
+        grid-template-rows: repeat(var(--_row-count), var(--_row-height));
         padding-inline: 5px;
         background:
         repeating-linear-gradient(
             to bottom,
             white 0,
-            white var(--row-height),
-            var(--clr-grey-light) var(--row-height),
-            var(--clr-grey-light) calc(var(--row-height) * 2)
+            white var(--_row-height),
+            var(--clr-grey-light) var(--_row-height),
+            var(--clr-grey-light) calc(var(--_row-height) * 2)
         );
         &:not(:last-child) {
             border-right: 1px solid var(--clr-grey);
@@ -389,8 +389,8 @@ Components
         // Can't inset with 50% because the container is the entire column
         position: absolute;
         width: 100%;
-        height: var(--row-height);
-        line-height: var(--row-height);
+        height: var(--_row-height);
+        line-height: var(--_row-height);
         margin-top: calc(1ex - 1cap);
 
         font-size: var(--fs-medium);
@@ -402,7 +402,8 @@ Components
     }
 }
 .activity {
-    padding: 2.5%;
+    grid-row: var(--_row-start, 1) / span var(--_row-span, -1);
+    margin: 2.5%;
     &:empty {
         display: none;
     }
@@ -414,40 +415,39 @@ Components
     &.activity--dropzone {
         display: block;
     }
-    &__card {
-        color: white;
-        text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-        font-size: var(--fs-regular);
-        border-radius: 6px;
-        word-break: break-all;
-        &:hover {
-            cursor: grab;
-        }
-        &:active {
-            cursor: grabbing;
-        }
-        &:not(.activity__card--being-dragged) {
-            padding: 5%;
-            height: 100%;
-        }
-        &--being-dragged {
-            // Constants
-            position: absolute;
-            z-index: 9999;
-            opacity: 0.9;
-            pointer-events: none;
-            // Variables
-            --height: 0;
-            --width: 0;
-            --padding: 0;
-            --top: 0;
-            --left: 0;
-            top: var(--top);
-            left: var(--left);
-            height: var(--height);
-            width: var(--width);
-            padding: var(--padding);
-        }
+}
+.card {
+    --_card-active-scale: 1.1;
+    color: white;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    font-size: var(--fs-regular);
+    border-radius: 6px;
+    word-break: break-all;
+    background-color: var(--_clr-card, rebeccapurple);
+    &:hover {
+        cursor: grab;
+    }
+    &:active {
+        cursor: grabbing;
+        scale: var(--_card-active-scale);
+    }
+    &:not(.card--being-dragged) {
+        padding: 5%;
+        height: 100%;
+    }
+    &--being-dragged {
+        // Constants
+        position: absolute;
+        z-index: 9999;
+        opacity: 0.9;
+        scale: var(--_card-active-scale);
+        pointer-events: none;
+        // Variables
+        top: var(--_top);
+        left: var(--_left);
+        height: var(--_height);
+        width: var(--_width);
+        padding: var(--_padding);
     }
 }
 .icon {
@@ -461,7 +461,6 @@ Components
 Pages
 ========================================================================== */
 .section-transition {
-    margin-top: -1px;
     width: 100vw;
 }
 /* ==========================================================================

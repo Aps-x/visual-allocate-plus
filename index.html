@@ -15,6 +15,7 @@
     <script src="js/random_sort.js" defer></script>
     <script src="js/accordion.js" defer></script>
     <script src="js/app.js" defer></script>
+    <script src="js/test.js" defer></script>
 </head>
 <body id="root">
     <header class="header">
@@ -39,19 +40,19 @@
                 <div class="grid-auto-fit" style="--min: 500px; --gap: 5rem;">
 
                     <form class="form | flow" style="--flow-spacer: 2.5rem;">
-                        <h2 class="form__title">Activity</h2>
+                        <h2 class="form__title">Activity Details</h2>
 
                         <div class="form__group">
-                            <label class="form__label" for="activity_name">Activity name</label>
-                            <input class="form__input | form__input--text" type="text" name="activity_name" id="activity_name">
+                            <label class="form__label" for="activity_name">Subject name</label>
+                            <input class="form__input | form__input--text" id="input_subject_name" type="text" required>
                         </div>
 
                         <div class="form__group">
                             <label class="form__label" for="activity_details">Copy/Paste Activity details here</label>
-                            <textarea class="form__input | form__input--textarea" name="activity_details" id="activity_details" spellcheck="false" autocomplete="off" autocorrect="off" required></textarea>
+                            <textarea class="form__input | form__input--textarea" id="textarea_activity_details" spellcheck="false" autocomplete="off" autocorrect="off" required></textarea>
                         </div>
 
-                        <button class="button" type="submit">
+                        <button class="button" type="submit" id="button_submit_user_input">
                             <span class="button__shadow"></span>
                             <span class="button__edge"></span>
                             <span class="button__front">Submit</span>
@@ -100,6 +101,9 @@
         <section>
             <h2 class="visually-hidden">Timetable</h2>
             <table class="timetable">
+                <thead class="timetable__controls">
+                    
+                </thead>
                 <tbody class="timetable__body">
                     <!-- Rows are rearranged to be columns -->
     
@@ -137,38 +141,38 @@
                         <th class="timetable__row-heading">9:30 PM</th>
                     </tr>
     
-                    <tr class="timetable__column" id="Monday">
+                    <tr class="timetable__column" id="Mon">
                         <th class="timetable__column-heading">Monday</th>
     
-                        <td class="activity" data-activity-id="1"><article class="activity__card" data-activity-id="1" draggable="true"><h3>Testing 123</h3></article></td>
+                        <td class="activity" data-subject-id="1"><article class="card" data-subject-id="1" draggable="true"><h3>Testing 123</h3></article></td>
 
-                        <td class="activity" data-activity-id="2"><article class="activity__card" data-activity-id="2" draggable="true"><h3>Testing 123</h3></article></td>
+                        <td class="activity" data-subject-id="2"><article class="card" data-subject-id="2" draggable="true"><h3>Testing 123</h3></article></td>
                     </tr>
     
-                    <tr class="timetable__column" id="Tuesday">
+                    <tr class="timetable__column" id="Tue">
                         <th class="timetable__column-heading">Tuesday</th>
 
-                        <td class="activity" data-activity-id="1"></td>
+                        <td class="activity" data-subject-id="1"></td>
 
-                        <td class="activity" data-activity-id="1"></td>
+                        <td class="activity" data-subject-id="1"></td>
 
-                        <td class="activity" data-activity-id="1"></td>
+                        <td class="activity" data-subject-id="1"></td>
 
-                        <td class="activity" data-activity-id="2"></td>
+                        <td class="activity" data-subject-id="2"></td>
                     </tr>
         
-                    <tr class="timetable__column" id="Wednesday">
+                    <tr class="timetable__column" id="Wed">
                         <th class="timetable__column-heading">Wednesday</th>
                         
-                        <td class="activity" data-activity-id="1"></td>
+                        <td class="activity" data-subject-id="1"></td>
                     </tr>
         
-                    <tr class="timetable__column" id="Thursday">
+                    <tr class="timetable__column" id="Thu">
                         <th class="timetable__column-heading">Thursday</th>
     
                     </tr>
         
-                    <tr class="timetable__column" id="Friday">
+                    <tr class="timetable__column" id="Fri">
                         <th class="timetable__column-heading">Friday</th>
     
                     </tr>

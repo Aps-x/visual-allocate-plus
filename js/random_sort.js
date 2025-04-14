@@ -1,4 +1,4 @@
-const list_of_cards = document.querySelectorAll(".activity__card");
+const list_of_cards = document.querySelectorAll(".card");
 
 const list_of_activities = document.querySelectorAll(".activity");
 
