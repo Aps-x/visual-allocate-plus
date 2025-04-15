@@ -57,7 +57,6 @@ class Subject {
 
         this.Create_Activities(activity_details);
         this.Add_Activities_To_Timetable();
-        this.Create_Card();
     }
 
     Create_Activities(activity_details) {
@@ -67,22 +66,24 @@ class Subject {
     Add_Activities_To_Timetable() {
         this.activities_list.forEach((activity, index) => {
             // Get the weekday column and append the activity
-            console.log(`${activity.day}`);
             const column = document.getElementById(`${activity.day}`);
+            const activity_node = column.appendChild(activity.Get_DOM_Element());
 
-            // TODO fix this
-
-
-            const activity_node = column.appendChild(`${activity.html}`);
-
-            // Guard statement :: Only add card to the first activity container
-            if (index !== 0) {
-                return;
+            // Add a card to the first activity container
+            // This is created by the Subject because 
+            if (index === 1) {
+                this.Create_Card(activity_node);
             }
-
-            const card = document.createElement('card-wc');
-            activity_node.appendChild(card);
         });
+    }
+
+    Create_Card(activity_node) {
+        const card = document.createElement('card-wc');
+        activity_node.appendChild(card);
+
+        // customElements.whenDefined('card-wc').then(() => {
+        //     card.Set_Card_Attributes(activity_node);
+        // });
     }
 
     Generate_Random_Subject_color() {
@@ -124,6 +125,14 @@ class Activity {
         this.html = `<td class="activity" data-subject-id="${this.subject_id}" data-activity-id="${this.id}" ${this.style}></td>`;
     }
 
+    Get_DOM_Element() {
+        // This method is hacky but it converts a string to DOM node
+        const template = document.createElement('template');
+        template.innerHTML = this.html;
+
+        return template.content.firstChild;
+    }
+
     Convert_Start_Time_To_Timetable_Row(start_time) {
         const activity_row_start = MAP_TIME_TO_TIMETABLE_ROW.get(start_time);
 
@@ -141,28 +150,27 @@ class Activity {
         // Rows are in 30 min segments
         return Math.round(hours * 2);
     }
-
-    Create_Card() {
-        const card = document.createElement('card-wc');
-        this.append(card);
-        card.Set_Card_Attributes(this);
-    }
 }
 
 class Card extends HTMLElement {
-    //--_clr-card: ${this.color};
+    
     constructor() {
         super();
-
-        this.activity = activity;
+        const template = document.getElementById('card-wc').content;
+        this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
     }
 
     connectedCallback() {
         console.log("Card custom element added to page.");
+
+        // Initialize card attributes
+        this.current_activity = this.closest(".activity");
+        this.Set_Card_Attributes(this.current_activity);
     }
 
     Set_Card_Attributes(activity) {
-
+        console.log("Card attributes set");
+        this.setAttribute("data-subject-id", activity.dataset.subjectId);
     }
 
 }
@@ -208,8 +216,6 @@ function Process_Activity_Details() {
     // Result:
     //   ["Activity Day Time Free Campus Location Duration Weeks Description"],
     //   ["01 Tue 13:30 10 BRUCE Building 7... 2 hrs ... ...],
-
-    console.log(array_of_lines);
 
     let activity_details_2d_array = array_of_lines.map(
         // Convert lines into 2D array 
