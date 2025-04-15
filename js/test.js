@@ -7,7 +7,8 @@ const TEXTAREA_ACTIVITY_DETAILS = document.getElementById("textarea_activity_det
 
 const BUTTON_SUBMIT_USER_INPUT = document.getElementById("button_submit_user_input");
 
-// The first row is used for headings
+// This could be more elegant but I like the simplicity.
+// Start from 2 because the first row is the header row.
 const MAP_TIME_TO_TIMETABLE_ROW = new Map([
     ["07:00", 2],
     ["07:30", 3],
@@ -50,13 +51,13 @@ class Subject {
     constructor(subject_name, activity_details) {
         this.id =       Subject.id_counter;
         this.name =     subject_name;
-        this.color =    Generate_Random_Subject_color();   
+        this.color =    this.Generate_Random_Subject_color();   
 
         Subject.id_counter++;
 
-        Create_Activities(activity_details);
-        Add_Activities_To_Timetable();
-        Create_Card();
+        this.Create_Activities(activity_details);
+        this.Add_Activities_To_Timetable();
+        this.Create_Card();
     }
 
     Create_Activities(activity_details) {
@@ -66,15 +67,20 @@ class Subject {
     Add_Activities_To_Timetable() {
         this.activities_list.forEach((activity, index) => {
             // Get the weekday column and append the activity
+            console.log(`${activity.day}`);
             const column = document.getElementById(`${activity.day}`);
-            const activity_node = column.appendChild(activity.html);
+
+            // TODO fix this
+
+
+            const activity_node = column.appendChild(`${activity.html}`);
 
             // Guard statement :: Only add card to the first activity container
             if (index !== 0) {
                 return;
             }
 
-            const card = new Card(activity);
+            const card = document.createElement('card-wc');
             activity_node.appendChild(card);
         });
     }
@@ -111,8 +117,8 @@ class Activity {
         this.description =  activity_details[8];
 
         // Derived data :: Required for placement in timetable
-        this.row_start = Convert_Start_Time_To_Timetable_Row(this.start_time);
-        this.row_span = Convert_Duration_To_Row_Span(this.duration);
+        this.row_start = this.Convert_Start_Time_To_Timetable_Row(this.start_time);
+        this.row_span = this.Convert_Duration_To_Row_Span(this.duration);
         
         this.style = `style="--_row-start: ${this.row_start}; --_row-span: ${this.row_span};"`
         this.html = `<td class="activity" data-subject-id="${this.subject_id}" data-activity-id="${this.id}" ${this.style}></td>`;
@@ -123,7 +129,7 @@ class Activity {
 
         // Guard statement :: Activity time not in map
         if (activity_row_start === undefined) {
-            console.error("Activity time string unable to be converted to grid row");
+            console.warn("Activity time string unable to be converted to grid row");
         }
 
         return activity_row_start;
@@ -135,11 +141,17 @@ class Activity {
         // Rows are in 30 min segments
         return Math.round(hours * 2);
     }
+
+    Create_Card() {
+        const card = document.createElement('card-wc');
+        this.append(card);
+        card.Set_Card_Attributes(this);
+    }
 }
 
 class Card extends HTMLElement {
     //--_clr-card: ${this.color};
-    constructor(activity) {
+    constructor() {
         super();
 
         this.activity = activity;
@@ -148,9 +160,14 @@ class Card extends HTMLElement {
     connectedCallback() {
         console.log("Card custom element added to page.");
     }
+
+    Set_Card_Attributes(activity) {
+
+    }
+
 }
 
-window.customElements.define('card', Card);
+window.customElements.define('card-wc', Card);
 
 /* ==========================================================================
 Event Listeners
@@ -182,24 +199,30 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
 Functions
 ========================================================================== */
 function Process_Activity_Details() {
-    // Create a 2D array => each activity is its own array / row
-    let activity_details_2d_array = TEXTAREA_ACTIVITY_DETAILS.value
-        .trim()
-        .split('\n')
-        .map(line => line.trim().split('\t'));
-    // Example:
-    //  [
-    //  ["", "Activity", "Day", "Time", "Free", "Campus", "Location", "Duration", "Weeks", "Description"],
-    //  ["", "01", "Tue", "13:30", "10", "BRUCE", "Building 7...", "2 hrs", "...", "..."],
-    //  ]
+    const user_input =  TEXTAREA_ACTIVITY_DETAILS.value.trim();
+    // Result:
+    //   ["Activity Day Time Free Campus Location Duration Weeks Description
+    //   01 Tue 13:30 10 BRUCE Building 7 2 hrs ... ..."]
+
+    const array_of_lines = user_input.split('\n');
+    // Result:
+    //   ["Activity Day Time Free Campus Location Duration Weeks Description"],
+    //   ["01 Tue 13:30 10 BRUCE Building 7... 2 hrs ... ...],
+
+    console.log(array_of_lines);
+
+    let activity_details_2d_array = array_of_lines.map(
+        // Convert lines into 2D array 
+        line => line.trim().split('\t')
+        // Trim whitespace off each element
+        .map(element => element.trim())
+    )
+    // Result:
+    //   ["Activity", "Day", "Time", "Free", "Campus", "Location", "Duration", "Weeks", "Description"],
+    //   ["01", "Tue", "13:30", "10", "BRUCE", "Building 7...", "2 hrs", "...", "..."],
 
     // Discard the top row
     activity_details_2d_array.shift();
-
-    // Discard the first column
-    activity_details_2d_array.forEach(row => {
-        row.shift();
-    });
 
     return activity_details_2d_array;
 }
