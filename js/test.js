@@ -101,8 +101,6 @@ class Subject {
 class Activity extends HTMLElement {
     constructor() {
         super();
-        const template = document.getElementById('activity-wc').content;
-        this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
     }
 
     Initialize(subject, activity_details) {
@@ -155,7 +153,6 @@ class Activity extends HTMLElement {
 
     Create_Card() {
         const card = document.createElement('card-wc');
-        card.Set_Card_Attributes(this);
         this.appendChild(card);
     }
 }
@@ -163,25 +160,44 @@ class Activity extends HTMLElement {
 // Purpose: Cards are what the user can see and manipulate.
 //-----------------------------------------------------------------------------
 class Card extends HTMLElement {
-    
     constructor() {
         super();
-        const template = document.getElementById('card-wc').content;
-        this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
     }
 
     connectedCallback() {
-        console.log("Card custom element added to page.");
+        console.log("Card web component added to page.");
+        this.Set_Card_Attributes();
     }
 
-    Set_Card_Attributes(activity) {
+    Set_Card_Attributes() {
+        // Grab a reference to the parent activity
+        const activity = this.closest(".activity");
+
+        // Guard Satement
+        if (activity === null || undefined) {
+            console.warn("Card could not find activity element");
+            return;
+        }
+        // Set attributes and custom properties on parent <card-wc> element
         this.setAttribute("class", "card");
         this.setAttribute("data-subject-id", activity.subject_id);
         this.setAttribute("draggable", "true");
 
         this.style.setProperty("--_clr-card", activity.color);
+
+        // Render innerHTML (duh)
+        this.Render_Inner_HTML(activity);
     }
 
+    Render_Inner_HTML(activity) {
+        this.innerHTML =
+            `
+            <h3>${activity.subject_name}</h3>
+            <p>${activity.activity_id}</p>
+            <p>${activity.location}</p>
+            <p>Spaces: ${activity.spaces}</p>
+            `
+    }
 }
 
 window.customElements.define('card-wc', Card);
