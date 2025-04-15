@@ -182,22 +182,56 @@
     </main>
 
     <footer>
+        <card-wc></card-wc>
 
     </footer>
 
     <template id="card-wc">
+        <style>
+            .card {
+                --_card-active-scale: 1.1;
+                color: white;
+                text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+                font-size: var(--fs-regular);
+                border-radius: 6px;
+                word-break: break-all;
+                background-color: var(--_clr-card, rebeccapurple);
+            }
+            .card:hover {
+                cursor: grab;
+            }
+            .card:active {
+                cursor: grabbing;
+                scale: var(--_card-active-scale);
+            }
+            .card:not(.card--being-dragged) {
+                padding: 5%;
+                height: 100%;
+            }
+            .card--being-dragged {
+                position: absolute;
+                z-index: 9999;
+                opacity: 0.9;
+                scale: var(--_card-active-scale);
+                pointer-events: none;
 
-        <article class="card" draggable="true">
-            <h3><span name="title"></span></h3>
-            <p><span name="id"></span></p>
-            <p><span name="location"></span></p>
-            <p><span name="spaces"></span></p>
+                top: var(--_top);
+                left: var(--_left);
+                height: var(--_height);
+                width: var(--_width);
+                padding: var(--_padding);
+            }
+        </style>
+
+        <article class="card">
+            <h3>Title:<span name="title">Default title</span></h3>
+            <p>ID:<span name="id">Default id</span></p>
+            <p>Location:<span name="location">Default location</span></p>
+            <p>Spaces:<span name="spaces">Default spaces</span></p>
         </article>
 
-        <style>
-
-        </style>
-        
     </template>
+
+    <template id="activity-wc"><div></div></template>
 </body>
 </html>

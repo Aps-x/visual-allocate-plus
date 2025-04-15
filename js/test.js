@@ -42,9 +42,10 @@ const MAP_TIME_TO_TIMETABLE_ROW = new Map([
     ["21:30", 31]   // 9:30 PM
 ]);
 
-// The following way of using objects could be implemented in several different ways.
-// I opted for the Subject class to control its own list of activities as they are
-// tightly coupled.
+//-----------------------------------------------------------------------------
+// Purpose: The Subject class is responsible for creating and controlling
+//          activities. It does not exist in the DOM.
+//-----------------------------------------------------------------------------
 class Subject {
     static id_counter = 0;
 
@@ -60,30 +61,25 @@ class Subject {
     }
 
     Create_Activities(activity_details) {
-        this.activities_list = activity_details.map(row => new Activity(this, row));
+        // For each activity array, create a web component and pass the array data
+        this.activities_list = activity_details.map(activity => {
+            const activity_wc = document.createElement('activity-wc');
+            activity_wc.Initialize(this, activity);
+            return activity_wc;
+        })
     }
 
     Add_Activities_To_Timetable() {
         this.activities_list.forEach((activity, index) => {
             // Get the weekday column and append the activity
             const column = document.getElementById(`${activity.day}`);
-            const activity_node = column.appendChild(activity.Get_DOM_Element());
+            const activity_wc = column.appendChild(activity);
 
-            // Add a card to the first activity container
-            // This is created by the Subject because 
-            if (index === 1) {
-                this.Create_Card(activity_node);
+            // One card per subject; Create in first activity
+            if (index === 0) {
+                activity_wc.Create_Card();
             }
         });
-    }
-
-    Create_Card(activity_node) {
-        const card = document.createElement('card-wc');
-        activity_node.appendChild(card);
-
-        // customElements.whenDefined('card-wc').then(() => {
-        //     card.Set_Card_Attributes(activity_node);
-        // });
     }
 
     Generate_Random_Subject_color() {
@@ -98,16 +94,25 @@ class Subject {
 
     }
 }
+//-----------------------------------------------------------------------------
+// Purpose: Activities act as containers for the cards. Normally invisible, but
+//          will display as dropzones when a related card is being dragged.
+//-----------------------------------------------------------------------------
+class Activity extends HTMLElement {
+    constructor() {
+        super();
+        const template = document.getElementById('activity-wc').content;
+        this.attachShadow({ mode: 'open' }).appendChild(template.cloneNode(true));
+    }
 
-class Activity {
-    constructor(subject, activity_details) {
+    Initialize(subject, activity_details) {
         // Subject data :: Shared across activities with same subject parent
         this.subject_id =   subject.id;
         this.subject_name = subject.name;
         this.color =        subject.color;
 
         // Activity data :: User input from Allocate+
-        this.id =           activity_details[0];
+        this.activity_id =  activity_details[0];
         this.day =          activity_details[1];
         this.start_time =   activity_details[2];
         this.spaces =       activity_details[3];
@@ -120,17 +125,14 @@ class Activity {
         // Derived data :: Required for placement in timetable
         this.row_start = this.Convert_Start_Time_To_Timetable_Row(this.start_time);
         this.row_span = this.Convert_Duration_To_Row_Span(this.duration);
-        
-        this.style = `style="--_row-start: ${this.row_start}; --_row-span: ${this.row_span};"`
-        this.html = `<td class="activity" data-subject-id="${this.subject_id}" data-activity-id="${this.id}" ${this.style}></td>`;
-    }
 
-    Get_DOM_Element() {
-        // This method is hacky but it converts a string to DOM node
-        const template = document.createElement('template');
-        template.innerHTML = this.html;
+        // Custom Element :: Attributes & Properties
+        this.style.setProperty("--_row-start", this.row_start);
+        this.style.setProperty("--_row-span", this.row_span);
 
-        return template.content.firstChild;
+        this.setAttribute("class", "activity");
+        this.setAttribute("data-subject-id", this.subject_id);
+        this.setAttribute("data-activity-id", this.activity_id); 
     }
 
     Convert_Start_Time_To_Timetable_Row(start_time) {
@@ -150,8 +152,16 @@ class Activity {
         // Rows are in 30 min segments
         return Math.round(hours * 2);
     }
-}
 
+    Create_Card() {
+        const card = document.createElement('card-wc');
+        card.Set_Card_Attributes(this);
+        this.appendChild(card);
+    }
+}
+//-----------------------------------------------------------------------------
+// Purpose: Cards are what the user can see and manipulate.
+//-----------------------------------------------------------------------------
 class Card extends HTMLElement {
     
     constructor() {
@@ -162,21 +172,20 @@ class Card extends HTMLElement {
 
     connectedCallback() {
         console.log("Card custom element added to page.");
-
-        // Initialize card attributes
-        this.current_activity = this.closest(".activity");
-        this.Set_Card_Attributes(this.current_activity);
     }
 
     Set_Card_Attributes(activity) {
-        console.log("Card attributes set");
-        this.setAttribute("data-subject-id", activity.dataset.subjectId);
+        this.setAttribute("class", "card");
+        this.setAttribute("data-subject-id", activity.subject_id);
+        this.setAttribute("draggable", "true");
+
+        this.style.setProperty("--_clr-card", activity.color);
     }
 
 }
 
 window.customElements.define('card-wc', Card);
-
+window.customElements.define('activity-wc', Activity);
 /* ==========================================================================
 Event Listeners
 ========================================================================== */
@@ -198,6 +207,8 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
     // More input validation would be nice... too bad!
 
     new Subject(INPUT_SUBJECT_NAME.value, activity_details);
+
+    Reset_User_Input_Fields();
 
     event.preventDefault();
 });

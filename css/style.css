@@ -210,7 +210,7 @@ Components
   display: block;
   resize: none;
   width: 100%;
-  aspect-ratio: 100/25;
+  aspect-ratio: 100/50;
 }
 
 .help__title {
