@@ -423,11 +423,11 @@ Components
   cursor: grabbing;
   scale: var(--_card-active-scale);
 }
-.card:not(.card--being-dragged) {
+.card[drag-in-progress=false] {
   padding: 5%;
   height: 100%;
 }
-.card--being-dragged {
+.card[drag-in-progress=true] {
   position: absolute;
   z-index: 9999;
   opacity: 0.9;

@@ -438,11 +438,11 @@ Components
         cursor: grabbing;
         scale: var(--_card-active-scale);
     }
-    &:not(.card--being-dragged) {
+    &[drag-in-progress="false"] {
         padding: 5%;
         height: 100%;
     }
-    &--being-dragged {
+    &[drag-in-progress="true"] {
         // Constants
         position: absolute;
         z-index: 9999;

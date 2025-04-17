@@ -1,9 +1,13 @@
 /* ==========================================================================
-Constants, Variables, Data, Objects
+Constants, Variables, Data
 ========================================================================== */
+const FORM_USER_INPUT = document.getElementById("form_user_input");
 const INPUT_SUBJECT_NAME = document.getElementById("input_subject_name");
 const TEXTAREA_ACTIVITY_DETAILS = document.getElementById("textarea_activity_details");
 const BUTTON_SUBMIT_USER_INPUT = document.getElementById("button_submit_user_input");
+
+const INVISIBLE_IMAGE = new Image();
+INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
 
 // Start from 2 because the first row is the header
 const MAP_TIME_TO_TIMETABLE_ROW = new Map([
@@ -39,181 +43,6 @@ const MAP_TIME_TO_TIMETABLE_ROW = new Map([
     ["21:30", 31]   // 9:30 PM
 ]);
 
-//-----------------------------------------------------------------------------
-// Purpose: The Subject class is responsible for creating and controlling
-//          activities. It does not exist in the DOM.
-//-----------------------------------------------------------------------------
-class Subject {
-    static id_counter = 0;
-
-    constructor(subject_name, activity_details) {
-        this.id =       Subject.id_counter;
-        this.name =     subject_name;
-        this.color =    this.Generate_Random_Subject_color();   
-
-        Subject.id_counter++;
-
-        this.Create_Activities(activity_details);
-        this.Add_Activities_To_Timetable();
-    }
-
-    Create_Activities(activity_details) {
-        // For each activity array: create a web component and initialize with activity info
-        // Then return / add the activity to the activities_list
-        this.activities_list = activity_details.map(activity => {
-            const activity_wc = document.createElement('activity-wc');
-            activity_wc.Initialize(this, activity);
-            return activity_wc;
-        })
-    }
-
-    Add_Activities_To_Timetable() {
-        this.activities_list.forEach((activity, index) => {
-            // Get the weekday column and append the activity
-            const column = document.getElementById(`${activity.day}`);
-            const activity_wc = column.appendChild(activity);
-
-            // Create a card in the first activity only
-            if (index === 0) {
-                activity_wc.Create_Card();
-            }
-        });
-    }
-
-    Generate_Random_Subject_color() {
-        return `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
-    }
-
-    Create_Delete_Subject_Button() {
-
-    }
-
-    Delete_All_Subject_Activities() {
-
-    }
-}
-//-----------------------------------------------------------------------------
-// Purpose: Activities act as containers for the cards. Normally invisible, but
-//          will display as dropzones when a related card is being dragged.
-//          Added to the DOM by the Subject class.
-//-----------------------------------------------------------------------------
-class Activity extends HTMLElement {
-    constructor() {
-        super();
-    }
-
-    Initialize(subject, activity_details) {
-        // Subject data :: Shared across activities with the same subject
-        this.subject_id =   subject.id;
-        this.subject_name = subject.name;
-        this.color =        subject.color;
-
-        // Activity data :: User input from Allocate+
-        this.activity_id =  activity_details[0];
-        this.day =          activity_details[1];
-        this.start_time =   activity_details[2];
-        this.spaces =       activity_details[3];
-        this.campus =       activity_details[4];
-        this.location =     activity_details[5];
-        this.duration =     activity_details[6];
-        this.weeks =        activity_details[7];
-        this.description =  activity_details[8];
-
-        // Derived data :: Required for placement in timetable
-        this.row_start = this.Convert_Start_Time_To_Timetable_Row(this.start_time);
-        this.row_span = this.Convert_Duration_To_Row_Span(this.duration);
-
-        // Custom Element :: Attributes & Properties
-        this.style.setProperty("--_row-start", this.row_start);
-        this.style.setProperty("--_row-span", this.row_span);
-
-        this.setAttribute("class", "activity");
-
-        // !!! REFACTOR: subject id might not be needed !!!
-        this.setAttribute("data-subject-id", this.subject_id);
-
-        this.setAttribute("data-activity-id", this.activity_id); 
-    }
-
-    Convert_Start_Time_To_Timetable_Row(start_time) {
-        const activity_row_start = MAP_TIME_TO_TIMETABLE_ROW.get(start_time);
-
-        // Guard statement :: Activity time not in map
-        if (activity_row_start === undefined) {
-            console.warn("Activity time string unable to be converted to grid row");
-        }
-
-        return activity_row_start;
-    }
-
-    Convert_Duration_To_Row_Span(duration) {
-        // Parse float will cut off when reading characters
-        const hours = parseFloat(duration);
-        // Rows are in 30 min segments
-        return Math.round(hours * 2);
-    }
-
-    Create_Card() {
-        const card = document.createElement('card-wc');
-        this.appendChild(card);
-    }
-}
-//-----------------------------------------------------------------------------
-// Purpose: Cards are what the user can see and manipulate.
-//-----------------------------------------------------------------------------
-class Card extends HTMLElement {
-    constructor() {
-        super();
-    }
-
-    connectedCallback() {
-        console.log("Card web component added to page.");
-
-        this.Set_Card_Attributes();
-
-        //this.addEventListener("dragstart", (event) => { });
-        this.addEventListener("dragstart", this.Handle_Dragstart.bind(this));
-    }
-
-    Handle_Dragstart(event) {
-        console.log(event);
-    }
-
-    Set_Card_Attributes() {
-        // Grab a reference to the parent activity
-        const activity = this.closest(".activity");
-
-        // Guard Satement
-        if (activity === null || undefined) {
-            console.warn("Card could not find activity element");
-            return;
-        }
-
-        // Set attributes and custom properties on <card-wc> element
-        this.setAttribute("class", "card");
-        this.setAttribute("data-subject-id", activity.subject_id);
-        this.setAttribute("draggable", "true");
-
-        this.style.setProperty("--_clr-card", activity.color);
-
-        // Render HTML (duh)
-        this.Render(activity);
-    }
-
-    Render(activity) {
-        // Remember to add accessibility <time> cause why not
-        this.innerHTML =
-            `
-            <h3>${activity.subject_name}</h3>
-            <p>${activity.activity_id}</p>
-            <p>${activity.location}</p>
-            <p>Spaces: ${activity.spaces}</p>
-            `
-    }
-}
-
-window.customElements.define('card-wc', Card);
-window.customElements.define('activity-wc', Activity);
 /* ==========================================================================
 Event Listeners
 ========================================================================== */
@@ -227,7 +56,7 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
     }
 
     // This needs to be after checking if the user provided the
-    // required inputs. This is because preventDefault() will also
+    // required inputs. This is because preventDefault() will
     // prevent the native popup for not filling out a field.
     event.preventDefault();
 
@@ -245,9 +74,8 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
 
     new Subject(INPUT_SUBJECT_NAME.value, activity_details);
 
-    Reset_User_Input_Fields();
+    FORM_USER_INPUT.reset();
 });
-
 
 /* ==========================================================================
 Functions
@@ -292,7 +120,294 @@ function Handle_Invalid_Activity_Input() {
     TEXTAREA_ACTIVITY_DETAILS.value = "";
 }
 
-function Reset_User_Input_Fields() {
-    INPUT_SUBJECT_NAME.value = "";
-    TEXTAREA_ACTIVITY_DETAILS.value = "";
+/* ==========================================================================
+Classes & Custom Elements
+========================================================================== */
+
+//-----------------------------------------------------------------------------
+// Purpose: The Subject class is responsible for creating and controlling
+//          activities. It also creates cards and listens for card drag events.
+//          Subject does not exist in the DOM.
+//-----------------------------------------------------------------------------
+class Subject {
+    static id_counter = 0;
+
+    constructor(subject_name, activity_details) {
+        this.id =       Subject.id_counter;
+        this.name =     subject_name;
+        this.color =    this.Generate_Random_Subject_color();   
+
+        Subject.id_counter++;
+
+        this.Create_Activities(activity_details);
+        this.Add_Activities_To_Timetable();
+    }
+
+    Create_Activities(activity_details) {
+        // For each activity array: create a web component and initialize with activity info
+        // Then return / add the activity to the activities_list
+        this.activities_list = activity_details.map(activity => {
+            const activity_wc = document.createElement('activity-wc');
+            activity_wc.Initialize(this, activity);
+            return activity_wc;
+        })
+    }
+
+    Add_Activities_To_Timetable() {
+        // Activity web components already exist in memory (activities_list)
+        // This function appends them to the DOM
+        this.activities_list.forEach((activity, index) => {
+            // Get the weekday column and append the activity
+            const column = document.getElementById(`${activity.day}`);
+            const activity_wc = column.appendChild(activity);
+
+            // Create a card in the first activity only
+            if (index === 0) {
+                this.Create_Card(activity_wc);
+            }
+        });
+    }
+
+    Create_Card(activity_wc) {
+        // Create the card and append it to the first <activity-wc>
+        const card = document.createElement('card-wc');
+        activity_wc.appendChild(card);
+
+        // Initialize the card and listen for card events
+        card.Initialize(this);
+        this.Listen_For_Card_Events(card)
+    }
+
+    Listen_For_Card_Events(card) {
+        card.addEventListener("dragstart", (event) => {
+            this.activities_list.forEach(activity => {
+                activity.classList.add("activity--dropzone");
+            });
+        });
+
+        card.addEventListener("dragend", (event) => {
+            this.activities_list.forEach(activity => {
+                activity.classList.remove("activity--dropzone");
+            });
+        });
+    }
+
+    Generate_Random_Subject_color() {
+        return `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
+    }
+
+    Create_Delete_Subject_Button() {
+
+    }
+
+    Delete_All_Subject_Activities() {
+
+    }
 }
+//-----------------------------------------------------------------------------
+// Purpose: Activities act as containers for the cards. Normally invisible, but
+//          will display as dropzones when a related card is being dragged.
+//          Created by the Subject class.
+//-----------------------------------------------------------------------------
+class Activity extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        this.addEventListener("dragover", this.Handle_Dragover.bind(this));
+        this.addEventListener("drop", this.Handle_Drop.bind(this));
+    }
+
+    Initialize(subject, activity_details) {
+        // Function called by Subject.
+        // Subject data :: Shared across activities with the same subject
+        this.subject_id =   subject.id;
+        this.subject_name = subject.name;
+        this.color =        subject.color;
+
+        // Activity data :: User input from Allocate+
+        this.activity_id =  activity_details[0];
+        this.day =          activity_details[1];
+        this.start_time =   activity_details[2];
+        this.spaces =       activity_details[3];
+        this.campus =       activity_details[4];
+        this.location =     activity_details[5];
+        this.duration =     activity_details[6];
+        this.weeks =        activity_details[7];
+        this.description =  activity_details[8];
+
+        // Derived data :: Required for placement in timetable
+        this.row_start = this.Convert_Start_Time_To_Timetable_Row(this.start_time);
+        this.row_span = this.Convert_Duration_To_Row_Span(this.duration);
+
+        // Custom Element :: Attributes & Properties
+        this.style.setProperty("--_row-start", this.row_start);
+        this.style.setProperty("--_row-span", this.row_span);
+
+        this.setAttribute("class", "activity");
+        this.setAttribute("data-subject-id", this.subject_id);
+    }
+
+    Handle_Dragover(event) {
+        // Dragover must be prevented or handled before the drop event can fire
+        event.preventDefault();
+    }
+
+    Handle_Drop(event) {
+        // // The drop event does not have a reference to what is being dropped :(
+        // // Referencing the card could be achieved multiple different ways.
+
+        // // Get the card's subject id using the DataTransfer API
+        const card_subject_id = event.dataTransfer.getData("text");
+        // // Select the card from the DOM; drag-in-progress="true" is specified incase 
+        // // this project is refactored to have multiple cards.
+        const card = document.querySelector(`card-wc[data-subject-id="${card_subject_id}"][drag-in-progress="true"]`);
+        
+        card.Set_Activity(this);
+    }
+
+    Convert_Start_Time_To_Timetable_Row(start_time) {
+        const activity_row_start = MAP_TIME_TO_TIMETABLE_ROW.get(start_time);
+
+        // Guard statement :: Activity time not in map
+        if (activity_row_start === undefined) {
+            console.warn("Activity time string unable to be converted to grid row");
+        }
+
+        return activity_row_start;
+    }
+
+    Convert_Duration_To_Row_Span(duration) {
+        // Parse float will cut off when reading characters
+        const hours = parseFloat(duration);
+        // Rows are in 30 min segments
+        return Math.round(hours * 2);
+    }
+}
+//-----------------------------------------------------------------------------
+// Purpose: Cards are what the user can see and manipulate. Created by the
+//          Subject class.
+//-----------------------------------------------------------------------------
+class Card extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    connectedCallback() {
+        // Guard Statement :: The card will be removed and appended multiple times
+        // which can cause connectedCallback() to invoke repeatedly
+        if (this.connected) {
+            return;
+        }
+        this.connected = true;
+        console.log("Card web component added to page.");
+
+        // document.addEventListener("dragover", this.Move_Card.bind(this));
+        this.addEventListener("dragstart", this.Handle_Dragstart.bind(this));
+        this.addEventListener("dragend", this.Handle_Dragend.bind(this));
+    }
+
+    Initialize(subject) {
+        // Function called by Subject.
+        // These attributes and properties only need to be set once.
+        this.setAttribute("class", "card");
+        this.setAttribute("data-subject-id", subject.id);
+        this.setAttribute("drag-in-progress", "false");
+        this.setAttribute("draggable", "true");
+        this.setAttribute("role", "article");
+        this.style.setProperty("--_clr-card", subject.color);
+
+        this.Update();
+    }
+
+    Render() {
+        this.innerHTML =
+            `
+            <h3>${this.activity.subject_name}</h3>
+            <p>${this.activity.activity_id}</p>
+            <p>${this.activity.location}</p>
+            <p>Spaces: ${this.activity.spaces}</p>
+            `
+    }
+
+    Update() {
+        // Grab a reference to the parent activity
+        this.activity = this.closest(".activity");
+
+        // Guard Statement
+        if (this.activity === null || undefined) {
+            console.warn("Card could not find activity element");
+            return;
+        }
+
+        // Render HTML
+        this.Render();
+    }
+
+    Handle_Dragstart(event) {
+        // Use the DataTransfer API to pass the subject-id to the Activity dropzone
+        event.dataTransfer.setData("text/plain", this.getAttribute("data-subject-id"));
+
+        // Offset the card position when being dragged...
+        // Based on where the user clicks on the card.
+        const rect = this.getBoundingClientRect();
+        this.offset_x = event.clientX - rect.left;
+        this.offset_y = event.clientY - rect.top;
+
+        // Card width is set by the grid-parent auto-columns.
+        // Card height and padding are percentage based for responsiveness.
+        // This introduces a problem when the card is moved to the body...
+        // Because percentage is relative to the container.
+        // Convert relative percentage values => absolute pixel values.
+        const card_computed_style = window.getComputedStyle(this);
+        
+        const card_padding = Get_Padding_As_Pixels(card_computed_style);
+
+        this.style.setProperty('--_width', card_computed_style.width);
+        this.style.setProperty('--_height', card_computed_style.height);
+        this.style.setProperty('--_padding', card_padding);
+
+        // IMPORANT: Must be added after computing the style
+        this.setAttribute("drag-in-progress", "true");
+
+        // Move card to the body
+        document.body.appendChild(this);
+
+        // Listen for the card's position over the document
+        this.document_dragover_handler = this.Move_Card.bind(this);
+        document.addEventListener("dragover", this.document_dragover_handler);
+
+        // Hide native drag image
+        event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
+    }
+
+    Handle_Dragend(event) {
+        // If the user drags the card over an invalid dropzone then
+        // this.activity will be the Card's previous container.
+        this.activity.appendChild(this);
+
+        this.setAttribute("drag-in-progress", "false");
+        document.removeEventListener("dragover", this.document_dragover_handler);
+
+        this.Update();
+    }
+
+    Move_Card(event) {
+        this.style.setProperty('--_left', `${event.pageX - this.offset_x}px`);
+        this.style.setProperty('--_top', `${event.pageY - this.offset_y}px`);
+    }
+
+    Set_Activity(activity) {
+        // Called by Activity
+        this.activity = activity;
+    }
+
+    Get_Padding_As_Pixels(computed_style) {
+        // Padding should be even on all sides
+        return computed_style.getPropertyValue('padding-left');
+    }
+}
+
+window.customElements.define('card-wc', Card);
+window.customElements.define('activity-wc', Activity);

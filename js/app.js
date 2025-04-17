@@ -4,8 +4,8 @@ Constants, Variables, Data
 const ACTIVITIES = document.querySelectorAll(".activity");
 const CARDS = document.querySelectorAll(".card");
 
-const INVISIBLE_IMAGE = new Image();
-INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
+const INVIS = new Image();
+INVIS.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
 
 let card_being_dragged = null;
 let current_subject_id = null;
@@ -53,7 +53,7 @@ CARDS.forEach(card => {
         Move_Card(event.pageX, event.pageY);
 
         // Hide native drag image
-        event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
+        event.dataTransfer.setDragImage(INVIS, 0, 0);
 
         // Highlight matching dropzones
         ACTIVITIES.forEach(activity => {
