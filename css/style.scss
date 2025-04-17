@@ -212,6 +212,12 @@ Components
             width: 100%;
             aspect-ratio: 100/50;
         }
+        // &:user-invalid:empty {
+        //     outline: 2px solid red;
+        // }
+        &:empty:user-invalid {
+            outline: 2px solid red;
+        }
     }
 }
 .help {

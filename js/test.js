@@ -2,13 +2,10 @@
 Constants, Variables, Data, Objects
 ========================================================================== */
 const INPUT_SUBJECT_NAME = document.getElementById("input_subject_name");
-
 const TEXTAREA_ACTIVITY_DETAILS = document.getElementById("textarea_activity_details");
-
 const BUTTON_SUBMIT_USER_INPUT = document.getElementById("button_submit_user_input");
 
-// This could be more elegant but I like the simplicity.
-// Start from 2 because the first row is the header row.
+// Start from 2 because the first row is the header
 const MAP_TIME_TO_TIMETABLE_ROW = new Map([
     ["07:00", 2],
     ["07:30", 3],
@@ -61,7 +58,8 @@ class Subject {
     }
 
     Create_Activities(activity_details) {
-        // For each activity array, create a web component and pass the array data
+        // For each activity array: create a web component and initialize with activity info
+        // Then return / add the activity to the activities_list
         this.activities_list = activity_details.map(activity => {
             const activity_wc = document.createElement('activity-wc');
             activity_wc.Initialize(this, activity);
@@ -75,7 +73,7 @@ class Subject {
             const column = document.getElementById(`${activity.day}`);
             const activity_wc = column.appendChild(activity);
 
-            // One card per subject; Create in first activity
+            // Create a card in the first activity only
             if (index === 0) {
                 activity_wc.Create_Card();
             }
@@ -97,6 +95,7 @@ class Subject {
 //-----------------------------------------------------------------------------
 // Purpose: Activities act as containers for the cards. Normally invisible, but
 //          will display as dropzones when a related card is being dragged.
+//          Added to the DOM by the Subject class.
 //-----------------------------------------------------------------------------
 class Activity extends HTMLElement {
     constructor() {
@@ -104,7 +103,7 @@ class Activity extends HTMLElement {
     }
 
     Initialize(subject, activity_details) {
-        // Subject data :: Shared across activities with same subject parent
+        // Subject data :: Shared across activities with the same subject
         this.subject_id =   subject.id;
         this.subject_name = subject.name;
         this.color =        subject.color;
@@ -129,7 +128,10 @@ class Activity extends HTMLElement {
         this.style.setProperty("--_row-span", this.row_span);
 
         this.setAttribute("class", "activity");
+
+        // !!! REFACTOR: subject id might not be needed !!!
         this.setAttribute("data-subject-id", this.subject_id);
+
         this.setAttribute("data-activity-id", this.activity_id); 
     }
 
@@ -166,7 +168,15 @@ class Card extends HTMLElement {
 
     connectedCallback() {
         console.log("Card web component added to page.");
+
         this.Set_Card_Attributes();
+
+        //this.addEventListener("dragstart", (event) => { });
+        this.addEventListener("dragstart", this.Handle_Dragstart.bind(this));
+    }
+
+    Handle_Dragstart(event) {
+        console.log(event);
     }
 
     Set_Card_Attributes() {
@@ -178,18 +188,20 @@ class Card extends HTMLElement {
             console.warn("Card could not find activity element");
             return;
         }
-        // Set attributes and custom properties on parent <card-wc> element
+
+        // Set attributes and custom properties on <card-wc> element
         this.setAttribute("class", "card");
         this.setAttribute("data-subject-id", activity.subject_id);
         this.setAttribute("draggable", "true");
 
         this.style.setProperty("--_clr-card", activity.color);
 
-        // Render innerHTML (duh)
-        this.Render_Inner_HTML(activity);
+        // Render HTML (duh)
+        this.Render(activity);
     }
 
-    Render_Inner_HTML(activity) {
+    Render(activity) {
+        // Remember to add accessibility <time> cause why not
         this.innerHTML =
             `
             <h3>${activity.subject_name}</h3>
@@ -214,10 +226,19 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
         return false;
     }
 
+    // This needs to be after checking if the user provided the
+    // required inputs. This is because preventDefault() will also
+    // prevent the native popup for not filling out a field.
+    event.preventDefault();
+
     const activity_details = Process_Activity_Details();
 
     // Guard statement :: User input is invalid
-    if (activity_details.length === 0) {
+    if (activity_details.length < 2) {
+        console.warn("Invalid activity details");
+
+        Handle_Invalid_Activity_Input();
+
         return false;
     }
     // More input validation would be nice... too bad!
@@ -225,8 +246,6 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
     new Subject(INPUT_SUBJECT_NAME.value, activity_details);
 
     Reset_User_Input_Fields();
-
-    event.preventDefault();
 });
 
 
@@ -242,7 +261,7 @@ function Process_Activity_Details() {
     const array_of_lines = user_input.split('\n');
     // Result:
     //   ["Activity Day Time Free Campus Location Duration Weeks Description"],
-    //   ["01 Tue 13:30 10 BRUCE Building 7... 2 hrs ... ...],
+    //   ["01 Tue 13:30 10 BRUCE Building 7... 2 hrs ... ..."],
 
     let activity_details_2d_array = array_of_lines.map(
         // Convert lines into 2D array 
@@ -258,6 +277,19 @@ function Process_Activity_Details() {
     activity_details_2d_array.shift();
 
     return activity_details_2d_array;
+}
+
+function Handle_Invalid_Activity_Input() {
+    // Using custom validity for the native popover message
+    TEXTAREA_ACTIVITY_DETAILS.setCustomValidity("Invalid activity details");
+    TEXTAREA_ACTIVITY_DETAILS.reportValidity();
+    // The above method causes the input to be permanently invalid, so reset immediately
+    TEXTAREA_ACTIVITY_DETAILS.setCustomValidity("");
+    // Clearing the textarea value does two things:
+    // 1. It clears the input (obvious)
+    // 2. Less obviously, it is the reason the input is outlined red because it now
+    //    meets the :user-invalid condition
+    TEXTAREA_ACTIVITY_DETAILS.value = "";
 }
 
 function Reset_User_Input_Fields() {
