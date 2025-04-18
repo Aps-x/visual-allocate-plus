@@ -212,9 +212,6 @@ Components
             width: 100%;
             aspect-ratio: 100/50;
         }
-        // &:user-invalid:empty {
-        //     outline: 2px solid red;
-        // }
         &:empty:user-invalid {
             outline: 2px solid red;
         }
@@ -253,6 +250,11 @@ Components
     transition: filter 250ms;
     width: fit-content;
     margin-inline: auto;
+    &--pill {
+        background-color: var(--_clr-button, rebeccapurple);
+        padding: 0.75rem 2rem;
+        border-radius: 100vmax;
+    }
     &__front {
         display: block;
         position: relative;
@@ -318,10 +320,13 @@ Components
 .accordion {
     margin-top: 4rem;
     box-shadow: var(--shadow-elevation-medium);
+    background: var(--clr-white);
+    border-radius: 6px;
     &__panel {
-        background: var(--clr-white);
-        border-radius: 6px;
         padding-inline: 2rem;
+        &:not(:first-child) {
+            border-top: 1px solid var(--clr-grey);
+        }
     }
     &__trigger {
         padding-block: 1.5rem;
@@ -414,8 +419,7 @@ Components
         display: none;
     }
     &--dropzone {
-        height: 100%;
-        background-color: var(--clr-blue-light);
+        background-color: color-mix(in srgb, var(--_clr-dropzone, rebeccapurple), gray 30%);
         border-radius: 6px;
     }
     &.activity--dropzone {
@@ -423,7 +427,7 @@ Components
     }
 }
 .card {
-    --_card-active-scale: 1.1;
+    --_card-active-scale: 1.05;
     display: block;
     color: white;
     text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
@@ -437,6 +441,10 @@ Components
     &:active {
         cursor: grabbing;
         scale: var(--_card-active-scale);
+    }
+    &__article {
+        height: 100%;
+        overflow: hidden;
     }
     &[drag-in-progress="false"] {
         padding: 5%;

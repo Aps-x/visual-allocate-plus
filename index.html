@@ -17,7 +17,7 @@
     <script src="js/app.js" defer></script>
     <script src="js/test.js" defer></script>
 </head>
-<body id="root">
+<body>
     <header class="header">
         <h1 class="header__title">Visual Allocate+</h1>
     </header>
@@ -66,13 +66,13 @@
                             <article class="accordion__panel">
 
                                 <h3 class="accordion__header">
-                                    <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="sect1" id="accordion1">
+                                    <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="sect_1" id="accordion_1">
                                         <span>How do I add an activity?</span>
                                         <img class="accordion__arrow" src="img/icon-arrow.svg" alt="">
                                     </button>
                                 </h3>
                                 
-                                <div class="accordion__content" id="sect1" role="region" aria-labelledby="accordion1" aria-hidden="true">
+                                <div class="accordion__content" id="sect_1" role="region" aria-labelledby="accordion_1" aria-hidden="true">
                                     <div>
                                         <h4 class="clr-blue fw-bold">Step-By-Step Guide</h4>
 
@@ -87,6 +87,27 @@
                                         <div class="help__demo-container">
                                             <img src="img/demo.gif" alt="">
                                         </div>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <article class="accordion__panel">
+
+                                <h3 class="accordion__header">
+                                    <button class="accordion__trigger" type="button" aria-expanded="false" aria-controls="sect_2" id="accordion_2">
+                                        <span>How does the timetable work?</span>
+                                        <img class="accordion__arrow" src="img/icon-arrow.svg" alt="">
+                                    </button>
+                                </h3>
+                                
+                                <div class="accordion__content" id="sect_2" role="region" aria-labelledby="accordion_2" aria-hidden="true">
+                                    <div>
+                                        <ol class="help__list">
+                                            <li class="help__list-item">Mouse over a card</li>
+                                            <li class="help__list-item">Press and hold left click</li>
+                                            <li class="help__list-item">Drag the card</li>
+                                            <li class="help__list-item">You can visualize your tutorials and lectures by dragging the cards</li>
+                                        </ol>
                                     </div>
                                 </div>
                             </article>
@@ -166,7 +187,7 @@
     </main>
 
     <footer>
-        
+
     </footer>
 </body>
 </html>

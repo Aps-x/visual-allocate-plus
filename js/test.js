@@ -240,10 +240,12 @@ class Activity extends HTMLElement {
         // Derived data :: Required for placement in timetable
         this.row_start = this.Convert_Start_Time_To_Timetable_Row(this.start_time);
         this.row_span = this.Convert_Duration_To_Row_Span(this.duration);
+        this.end_time = this.Determine_End_Time_String(this.row_start, this.row_span);
 
         // Custom Element :: Attributes & Properties
         this.style.setProperty("--_row-start", this.row_start);
         this.style.setProperty("--_row-span", this.row_span);
+        this.style.setProperty("--_clr-dropzone", this.color);
 
         this.setAttribute("class", "activity");
         this.setAttribute("data-subject-id", this.subject_id);
@@ -284,6 +286,14 @@ class Activity extends HTMLElement {
         // Rows are in 30 min segments
         return Math.round(hours * 2);
     }
+
+    Determine_End_Time_String(row_start, row_span) {
+        const end_row = row_start + row_span;
+        // REFACTOR
+        while (end_time === null || undefined) {
+
+        }
+    }
 }
 //-----------------------------------------------------------------------------
 // Purpose: Cards are what the user can see and manipulate. Created by the
@@ -301,9 +311,8 @@ class Card extends HTMLElement {
             return;
         }
         this.connected = true;
-        console.log("Card web component added to page.");
+        console.log("Card connected");
 
-        // document.addEventListener("dragover", this.Move_Card.bind(this));
         this.addEventListener("dragstart", this.Handle_Dragstart.bind(this));
         this.addEventListener("dragend", this.Handle_Dragend.bind(this));
     }
@@ -311,11 +320,10 @@ class Card extends HTMLElement {
     Initialize(subject) {
         // Function called by Subject.
         // These attributes and properties only need to be set once.
-        this.setAttribute("class", "card");
+        this.setAttribute("class", "card | flow");
         this.setAttribute("data-subject-id", subject.id);
         this.setAttribute("drag-in-progress", "false");
         this.setAttribute("draggable", "true");
-        this.setAttribute("role", "article");
         this.style.setProperty("--_clr-card", subject.color);
 
         this.Update();
@@ -324,10 +332,12 @@ class Card extends HTMLElement {
     Render() {
         this.innerHTML =
             `
-            <h3>${this.activity.subject_name}</h3>
-            <p>${this.activity.activity_id}</p>
-            <p>${this.activity.location}</p>
-            <p>Spaces: ${this.activity.spaces}</p>
+            <article class="card__article">
+                <h3>${this.activity.subject_name}</h3>
+                <p>${this.activity.activity_id}</p>
+                <p>${this.activity.location}</p>
+                <p>Spaces: ${this.activity.spaces}</p>
+            </article>
             `
     }
 
@@ -389,8 +399,19 @@ class Card extends HTMLElement {
 
         this.setAttribute("drag-in-progress", "false");
         document.removeEventListener("dragover", this.document_dragover_handler);
+        this.Reset_Position();
 
         this.Update();
+    }
+
+    Reset_Position() {
+        const card_rect = this.getBoundingClientRect();
+
+        const left = card_rect.left + window.scrollX;
+        const right = document.documentElement.scrollWidth - (card_rect.right + window.scrollX);
+
+        this.style.setProperty('--_left', `${left}px`);
+        this.style.setProperty('--_right', `${right}px`);
     }
 
     Move_Card(event) {
