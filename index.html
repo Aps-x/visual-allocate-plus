@@ -43,16 +43,16 @@
                         <h2 class="form__title">Activity Details</h2>
 
                         <div class="form__group">
-                            <label class="form__label" for="activity_name">Subject name</label>
+                            <label class="form__label" for="input_subject_name">Subject name</label>
                             <input class="form__input | form__input--text" id="input_subject_name" type="text" required>
                         </div>
 
                         <div class="form__group">
-                            <label class="form__label" for="activity_details">Copy/Paste Activity details here</label>
+                            <label class="form__label" for="textarea_activity_details">Copy/Paste Activity details here</label>
                             <textarea class="form__input | form__input--textarea" id="textarea_activity_details" spellcheck="false" autocomplete="off" autocorrect="off" required></textarea>
                         </div>
 
-                        <button class="button" type="submit" id="button_submit_user_input">
+                        <button class="button | my-auto" type="submit" id="button_submit_user_input">
                             <span class="button__shadow"></span>
                             <span class="button__edge"></span>
                             <span class="button__front">Submit</span>
@@ -74,8 +74,6 @@
                                 
                                 <div class="accordion__content" id="sect_1" role="region" aria-labelledby="accordion_1" aria-hidden="true">
                                     <div>
-                                        <h4 class="clr-blue fw-bold">Step-By-Step Guide</h4>
-
                                         <ol class="help__list">
                                             <li class="help__list-item">Go to your timetable on the Allocate+ website</li>
                                             <li class="help__list-item">On the left hand side, click on a tutorial or lecture link</li>
@@ -119,70 +117,88 @@
 
         <img class="section-transition" src="img/wave.svg" alt="">
 
-        <section>
-            <h2 class="visually-hidden">Timetable</h2>
-            <table class="timetable">
-                <thead class="timetable__controls">
-                    
-                </thead>
-                <tbody class="timetable__body">
-                    <!-- Rows are rearranged to be columns -->
-    
-                    <tr class="timetable__column">
-                        <td></td>
-                        <th class="timetable__row-heading">7:00 AM</th>
-                        <th class="timetable__row-heading">7:30 AM</th>
-                        <th class="timetable__row-heading">8:00 AM</th>
-                        <th class="timetable__row-heading">8:30 AM</th>
-                        <th class="timetable__row-heading">9:00 AM</th>
-                        <th class="timetable__row-heading">9:30 AM</th>
-                        <th class="timetable__row-heading">10:00 AM</th>
-                        <th class="timetable__row-heading">10:30 AM</th>
-                        <th class="timetable__row-heading">11:00 AM</th>
-                        <th class="timetable__row-heading">11:30 AM</th>
-                        <th class="timetable__row-heading">12:00 PM</th>
-                        <th class="timetable__row-heading">12:30 PM</th>
-                        <th class="timetable__row-heading">1:00 PM</th>
-                        <th class="timetable__row-heading">1:30 PM</th>
-                        <th class="timetable__row-heading">2:00 PM</th>
-                        <th class="timetable__row-heading">2:30 PM</th>
-                        <th class="timetable__row-heading">3:00 PM</th>
-                        <th class="timetable__row-heading">3:30 PM</th>
-                        <th class="timetable__row-heading">4:00 PM</th>
-                        <th class="timetable__row-heading">4:30 PM</th>
-                        <th class="timetable__row-heading">5:00 PM</th>
-                        <th class="timetable__row-heading">5:30 PM</th>
-                        <th class="timetable__row-heading">6:00 PM</th>
-                        <th class="timetable__row-heading">6:30 PM</th>
-                        <th class="timetable__row-heading">7:00 PM</th>
-                        <th class="timetable__row-heading">7:30 PM</th>
-                        <th class="timetable__row-heading">8:00 PM</th>
-                        <th class="timetable__row-heading">8:30 PM</th>
-                        <th class="timetable__row-heading">9:00 PM</th>
-                        <th class="timetable__row-heading">9:30 PM</th>
-                    </tr>
-    
-                    <tr class="timetable__column" id="Mon">
-                        <th class="timetable__column-heading">Monday</th>
-                    </tr>
-    
-                    <tr class="timetable__column" id="Tue">
-                        <th class="timetable__column-heading">Tuesday</th>
-                    </tr>
-        
-                    <tr class="timetable__column" id="Wed">
-                        <th class="timetable__column-heading">Wednesday</th>
-                    </tr>
-        
-                    <tr class="timetable__column" id="Thu">
-                        <th class="timetable__column-heading">Thursday</th>
-                    </tr>
-        
-                    <tr class="timetable__column" id="Fri">
-                        <th class="timetable__column-heading">Friday</th>
-                    </tr>
-                </tbody>
-            </table>
+        <section class="timetable">
+            <header class="timetable__header">
+                <h2 class="visually-hidden">Timetable</h2>
+
+                <div class="timetable__controls | content-column cluster" id="timetable_controls">
+
+                </div>
+
+                <button class="button" id="button_activity_toggle" aria-pressed="false">
+                    <span class="button__shadow"></span>
+                    <span class="button__edge"></span>
+                    <span class="button__front">
+                    </span>
+                 </button>
+            </header>
+
+            <div class="timetable__body">
+                <ol class="timetable__column" role="list">
+                    <li aria-hidden="true"></li>
+                    <li class="timetable__row-time"><time datetime="07:00">7:00 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="07:30">7:30 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="08:00">8:00 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="08:30">8:30 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="09:00">9:00 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="09:30">9:30 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="10:00">10:00 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="10:30">10:30 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="11:00">11:00 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="11:30">11:30 AM</time></li>
+                    <li class="timetable__row-time"><time datetime="12:00">12:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="12:30">12:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="13:00">1:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="13:30">1:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="14:00">2:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="14:30">2:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="15:00">3:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="15:30">3:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="16:00">4:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="16:30">4:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="17:00">5:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="17:30">5:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="18:00">6:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="18:30">6:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="19:00">7:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="19:30">7:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="20:00">8:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="20:30">8:30 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="21:00">9:00 PM</time></li>
+                    <li class="timetable__row-time"><time datetime="21:30">9:30 PM</time></li>
+                </ol>
+                
+                <div class="timetable__column">
+                    <h3 class="timetable__column-heading" data-short="Mon">Monday</h3>
+
+                    <ul class="timetable__activity-container" id="Mon" role="list"></ul>
+                </div>
+                
+                <div class="timetable__column">
+                    <h3 class="timetable__column-heading" data-short="Tue">Tuesday</h3>
+
+                    <ul class="timetable__activity-container" id="Tue" role="list"></ul>
+                </div>
+                
+                <div class="timetable__column">
+                    <h3 class="timetable__column-heading" data-short="Wed">Wednesday</h3>
+
+                    <ul class="timetable__activity-container" id="Wed" role="list"></ul>
+                </div>
+                
+                <div class="timetable__column">
+                    <h3 class="timetable__column-heading" data-short="Thu">Thursday</h3>
+
+                    <ul class="timetable__activity-container" id="Thu" role="list"></ul>
+                </div>
+                
+                <div class="timetable__column">
+                    <h3 class="timetable__column-heading" data-short="Fri">Friday</h3>
+
+                    <ul class="timetable__activity-container" id="Fri" role="list"></ul>
+                </div>
+                
+            </div>
         </section>
     </main>
 

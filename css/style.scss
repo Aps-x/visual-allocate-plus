@@ -43,6 +43,8 @@ Abstract
     --body-bg: var(--clr-white);
     --body-clr: var(--clr-navy);
 
+    --timetable-column-heading-fs: clamp(0.875rem, 0.5272rem + 1.7391vw, 1.875rem);
+
     --link-clr: var(--clr-black);
     --link-clr-hover: var(--clr-accent);
 
@@ -66,9 +68,13 @@ Abstract
         25.8px 23.6px 39.3px -2.1px hsl(var(--shadow-color) / 0.34),
         38px 34.7px 57.9px -2.5px hsl(var(--shadow-color) / 0.34);
 }
-    // Breakpoints
-    $breakpoint-desktop-small: 992px;
-    $breakpoint-tablet:        768px;
+// --- SASS --- //
+$breakpoint-desktop-small: 992px;
+$breakpoint-tablet:        768px;
+
+@mixin text-outline($clr-outline: black) {
+    text-shadow: -1px -1px 0 $clr-outline, 1px -1px 0 $clr-outline, -1px 1px 0 $clr-outline, 1px 1px 0 $clr-outline;
+}
 /* ==========================================================================
 Base
 ========================================================================== */
@@ -100,6 +106,10 @@ img, picture, video, canvas, svg {
     font-style: italic;
     background-repeat: no-repeat;
     background-size: cover;
+}
+ul[role='list'],
+ol[role='list'] {
+  list-style: none;
 }
 input {
     accent-color: var(--clr-accent);
@@ -240,6 +250,9 @@ Components
     }
 }
 .button {
+    --_btn-clr-bg: hsl(0deg 0% 90%);
+    --_btn-clr-txt: var(--clr-navy);
+    --_btn-fw: var(--fw-semi-bold);
     display: block;
     position: relative;
     border: none;
@@ -249,20 +262,20 @@ Components
     outline-offset: 4px;
     transition: filter 250ms;
     width: fit-content;
-    margin-inline: auto;
-    &--pill {
-        background-color: var(--_clr-button, rebeccapurple);
-        padding: 0.75rem 2rem;
-        border-radius: 100vmax;
+    &--delete {
+        --_btn-clr-txt: var(--clr-white);
+        @include text-outline();
     }
     &__front {
         display: block;
         position: relative;
         padding: 0.75rem 2rem;
         border-radius: 0.75rem;
-        font-weight: var(--fw-semi-bold);
-        color: var(--clr-navy);
-        background: hsl(0deg 0% 90%);
+
+        font-weight: var(--_btn-fw);
+        color: var(--_btn-clr-txt);
+        background: var(--_btn-clr-bg);
+
         will-change: transform;
         transform: translateY(-4px);
         transition: transform 600ms cubic-bezier(.3, .7, .4, 1);
@@ -288,10 +301,10 @@ Components
         border-radius: 0.75rem;
         background: linear-gradient(
           to left,
-          hsl(0, 0%, 20%) 0%, 
-          hsl(0, 0%, 30%) 8%,
-          hsl(0, 0%, 30%) 92%,
-          hsl(0, 0%, 20%) 100%
+            color-mix(in srgb, hsl(0, 0%, 20%) 70%, var(--_btn-clr-bg) 30%) 0%, 
+            color-mix(in srgb, hsl(0, 0%, 30%) 70%, var(--_btn-clr-bg) 30%) 8%,
+            color-mix(in srgb, hsl(0, 0%, 30%) 70%, var(--_btn-clr-bg) 30%) 92%,
+            color-mix(in srgb, hsl(0, 0%, 20%) 70%, var(--_btn-clr-bg) 30%) 100%
         );
     }
     &:hover {
@@ -370,13 +383,24 @@ Components
 }
 .timetable {
     --_row-count: 31;
-    --_row-height: 100px;
-    width: 100%;
+    --_row-height: 75px;
+    width: min(100%, 1920px);
+    margin-inline: auto;
+    &__controls {
+        --max-width: 800px;
+        justify-content: center;
+    }
     &__body {
         display: grid;
         grid-template-columns: 150px repeat(5, 1fr);
+
+        @media only screen and (max-width: $breakpoint-desktop-small) {
+            grid-template-columns: repeat(6, 1fr);
+        }
     }
     &__column {
+        // Post-refactor, the activity-container could act as the grid
+        // but I think this is fine how it is...
         position: relative;
         display: grid;
         grid-auto-flow: column dense;
@@ -400,16 +424,30 @@ Components
         // Can't inset with 50% because the container is the entire column
         position: absolute;
         width: 100%;
-        height: var(--_row-height);
         line-height: var(--_row-height);
         margin-top: calc(1ex - 1cap);
 
-        font-size: var(--fs-medium);
+        text-align: center;
+        font-size: var(--timetable-column-heading-fs);
         font-weight: var(--fw-bold);
         color: var(--clr-slate-dark);
+
+        // Shorten day names on small screens (Monday => Mon)
+        @media only screen and (max-width: $breakpoint-desktop-small) {
+            color: transparent; 
+            &::before {
+                content: attr(data-short);
+                display: block;
+                color: var(--clr-navy);
+            }
+        }
     }
-    &__row-heading {
+    &__row-time {
+        text-align: center;
         font-size: var(--fs-regular);
+    }
+    &__activity-container {
+        display: contents;
     }
 }
 .activity {
@@ -430,7 +468,7 @@ Components
     --_card-active-scale: 1.05;
     display: block;
     color: white;
-    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+    @include text-outline();
     font-size: var(--fs-regular);
     border-radius: 6px;
     word-break: break-all;

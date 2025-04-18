@@ -35,6 +35,7 @@ Abstract
   --body-lh: 1.4;
   --body-bg: var(--clr-white);
   --body-clr: var(--clr-navy);
+  --timetable-column-heading-fs: clamp(0.875rem, 0.5272rem + 1.7391vw, 1.875rem);
   --link-clr: var(--clr-black);
   --link-clr-hover: var(--clr-accent);
   --shadow-color: 214deg 100% 23%;
@@ -92,6 +93,11 @@ img, picture, video, canvas, svg {
   font-style: italic;
   background-repeat: no-repeat;
   background-size: cover;
+}
+
+ul[role=list],
+ol[role=list] {
+  list-style: none;
 }
 
 input {
@@ -238,6 +244,9 @@ Components
 }
 
 .button {
+  --_btn-clr-bg: hsl(0deg 0% 90%);
+  --_btn-clr-txt: var(--clr-navy);
+  --_btn-fw: var(--fw-semi-bold);
   display: block;
   position: relative;
   border: none;
@@ -248,21 +257,19 @@ Components
   transition: filter 250ms;
   width: -moz-fit-content;
   width: fit-content;
-  margin-inline: auto;
 }
-.button--pill {
-  background-color: var(--_clr-button, rebeccapurple);
-  padding: 0.75rem 2rem;
-  border-radius: 100vmax;
+.button--delete {
+  --_btn-clr-txt: var(--clr-white);
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
 }
 .button__front {
   display: block;
   position: relative;
   padding: 0.75rem 2rem;
   border-radius: 0.75rem;
-  font-weight: var(--fw-semi-bold);
-  color: var(--clr-navy);
-  background: hsl(0, 0%, 90%);
+  font-weight: var(--_btn-fw);
+  color: var(--_btn-clr-txt);
+  background: var(--_btn-clr-bg);
   will-change: transform;
   transform: translateY(-4px);
   transition: transform 600ms cubic-bezier(0.3, 0.7, 0.4, 1);
@@ -286,7 +293,7 @@ Components
   width: 100%;
   height: 100%;
   border-radius: 0.75rem;
-  background: linear-gradient(to left, hsl(0, 0%, 20%) 0%, hsl(0, 0%, 30%) 8%, hsl(0, 0%, 30%) 92%, hsl(0, 0%, 20%) 100%);
+  background: linear-gradient(to left, color-mix(in srgb, hsl(0, 0%, 20%) 70%, var(--_btn-clr-bg) 30%) 0%, color-mix(in srgb, hsl(0, 0%, 30%) 70%, var(--_btn-clr-bg) 30%) 8%, color-mix(in srgb, hsl(0, 0%, 30%) 70%, var(--_btn-clr-bg) 30%) 92%, color-mix(in srgb, hsl(0, 0%, 20%) 70%, var(--_btn-clr-bg) 30%) 100%);
 }
 .button:hover {
   filter: brightness(110%);
@@ -365,12 +372,22 @@ Components
 
 .timetable {
   --_row-count: 31;
-  --_row-height: 100px;
-  width: 100%;
+  --_row-height: 75px;
+  width: min(100%, 1920px);
+  margin-inline: auto;
+}
+.timetable__controls {
+  --max-width: 800px;
+  justify-content: center;
 }
 .timetable__body {
   display: grid;
   grid-template-columns: 150px repeat(5, 1fr);
+}
+@media only screen and (max-width: 992px) {
+  .timetable__body {
+    grid-template-columns: repeat(6, 1fr);
+  }
 }
 .timetable__column {
   position: relative;
@@ -387,15 +404,29 @@ Components
 .timetable__column-heading {
   position: absolute;
   width: 100%;
-  height: var(--_row-height);
   line-height: var(--_row-height);
   margin-top: calc(1ex - 1cap);
-  font-size: var(--fs-medium);
+  text-align: center;
+  font-size: var(--timetable-column-heading-fs);
   font-weight: var(--fw-bold);
   color: var(--clr-slate-dark);
 }
-.timetable__row-heading {
+@media only screen and (max-width: 992px) {
+  .timetable__column-heading {
+    color: transparent;
+  }
+  .timetable__column-heading::before {
+    content: attr(data-short);
+    display: block;
+    color: var(--clr-navy);
+  }
+}
+.timetable__row-time {
+  text-align: center;
   font-size: var(--fs-regular);
+}
+.timetable__activity-container {
+  display: contents;
 }
 
 .activity {

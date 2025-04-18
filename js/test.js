@@ -6,6 +6,8 @@ const INPUT_SUBJECT_NAME = document.getElementById("input_subject_name");
 const TEXTAREA_ACTIVITY_DETAILS = document.getElementById("textarea_activity_details");
 const BUTTON_SUBMIT_USER_INPUT = document.getElementById("button_submit_user_input");
 
+const TIMETABLE_CONTROLS = document.getElementById("timetable_controls");
+
 const INVISIBLE_IMAGE = new Image();
 INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
 
@@ -123,7 +125,6 @@ function Handle_Invalid_Activity_Input() {
 /* ==========================================================================
 Classes & Custom Elements
 ========================================================================== */
-
 //-----------------------------------------------------------------------------
 // Purpose: The Subject class is responsible for creating and controlling
 //          activities. It also creates cards and listens for card drag events.
@@ -141,6 +142,7 @@ class Subject {
 
         this.Create_Activities(activity_details);
         this.Add_Activities_To_Timetable();
+        this.Create_Delete_Subject_Button();
     }
 
     Create_Activities(activity_details) {
@@ -157,9 +159,9 @@ class Subject {
         // Activity web components already exist in memory (activities_list)
         // This function appends them to the DOM
         this.activities_list.forEach((activity, index) => {
-            // Get the weekday column and append the activity
-            const column = document.getElementById(`${activity.day}`);
-            const activity_wc = column.appendChild(activity);
+            // Get the activity container and append the activity
+            const activity_container = document.getElementById(`${activity.day}`);
+            const activity_wc = activity_container.appendChild(activity);
 
             // Create a card in the first activity only
             if (index === 0) {
@@ -197,11 +199,30 @@ class Subject {
     }
 
     Create_Delete_Subject_Button() {
+        const template = document.createElement("template");
+        template.innerHTML = 
+        `<button class="button | button--delete" style="--_btn-clr-bg: ${this.color};">
+            <span class="button__shadow"></span>
+            <span class="button__edge"></span>
+            <span class="button__front">
+                Remove ${this.name}
+                <img class="icon" src="img/trash-x.svg" alt="Trash Can">
+            </span>
+         </button>`
+        const button = template.content.firstChild;
 
+        button.addEventListener("click", this.Delete_Subject.bind(this));
+
+        TIMETABLE_CONTROLS.appendChild(button);
     }
 
-    Delete_All_Subject_Activities() {
+    Delete_Subject(event) {
+        // Removes the delete subject button and all activity containers
+        event.target.remove();
 
+        this.activities_list.forEach(activity => {
+            activity.remove();
+        });
     }
 }
 //-----------------------------------------------------------------------------
@@ -249,6 +270,7 @@ class Activity extends HTMLElement {
 
         this.setAttribute("class", "activity");
         this.setAttribute("data-subject-id", this.subject_id);
+        this.setAttribute("role", "listitem");
     }
 
     Handle_Dragover(event) {
@@ -289,10 +311,15 @@ class Activity extends HTMLElement {
 
     Determine_End_Time_String(row_start, row_span) {
         const end_row = row_start + row_span;
-        // REFACTOR
-        while (end_time === null || undefined) {
 
+        for (const [time, row] of MAP_TIME_TO_TIMETABLE_ROW.entries()) {
+            if (row === end_row) {
+                return time;
+            }
         }
+
+        console.warn("Unable to determine activity end time string");
+        return null;
     }
 }
 //-----------------------------------------------------------------------------
@@ -330,15 +357,29 @@ class Card extends HTMLElement {
     }
 
     Render() {
-        this.innerHTML =
-            `
+        const {
+            subject_name,
+            activity_id,
+            start_time,
+            end_time,
+            location,
+            spaces
+        } = this.activity;
+    
+        this.innerHTML = `
             <article class="card__article">
-                <h3>${this.activity.subject_name}</h3>
-                <p>${this.activity.activity_id}</p>
-                <p>${this.activity.location}</p>
-                <p>Spaces: ${this.activity.spaces}</p>
+                <h4>${subject_name} ${activity_id}</h4>
+    
+                <p>
+                    <time datetime="${start_time}">${start_time}</time> 
+                    – 
+                    <time datetime="${end_time}">${end_time}</time>
+                </p>
+    
+                <p>${location}</p>
+                <p>Spaces: ${spaces}</p>
             </article>
-            `
+        `;
     }
 
     Update() {
@@ -429,6 +470,40 @@ class Card extends HTMLElement {
         return computed_style.getPropertyValue('padding-left');
     }
 }
+//-----------------------------------------------------------------------------
+// Purpose: Last minute hack for controlling all subjects. Putting this at the
+//          bottom because it sucks.
+//-----------------------------------------------------------------------------
+class Subject_Registry {
+    constructor() {
+        this.list_of_subjects = []
+        this.subjects_visible = true;
 
+        // Grab button from DOM and listen for click
+    }
+
+    // REFACTOR
+    Create_Toggle_Activity_Visibility_Button() {
+        const template = document.createElement("template");
+        template.innerHTML = 
+        `<button class="button" style="--_btn-clr-bg: ${this.color};">
+            <span class="button__shadow"></span>
+            <span class="button__edge"></span>
+            <span class="button__front">
+            </span>
+         </button>`
+        const button = template.content.firstChild;
+
+        button.addEventListener("click", this.Toggle_Activity_Visibility.bind(this));
+
+        TIMETABLE_CONTROLS.appendChild(button);
+    }
+}
+/* ==========================================================================
+Runtime
+========================================================================== */
 window.customElements.define('card-wc', Card);
 window.customElements.define('activity-wc', Activity);
+
+// Last minute hack
+const subject_registry = new Subject_Registry();
