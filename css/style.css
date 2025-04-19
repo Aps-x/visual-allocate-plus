@@ -244,7 +244,7 @@ Components
 }
 
 .button {
-  --_btn-clr-bg: hsl(0deg 0% 90%);
+  --_btn-clr-bg: var(--clr-grey-light);
   --_btn-clr-txt: var(--clr-navy);
   --_btn-fw: var(--fw-semi-bold);
   display: block;
@@ -255,10 +255,15 @@ Components
   cursor: pointer;
   outline-offset: 4px;
   transition: filter 250ms;
-  width: -moz-fit-content;
-  width: fit-content;
+  max-width: -moz-fit-content;
+  max-width: fit-content;
 }
 .button--delete {
+  --_btn-clr-txt: var(--clr-white);
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+}
+.button--toggle {
+  --_btn-clr-bg: var(--clr-blue);
   --_btn-clr-txt: var(--clr-white);
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
 }
@@ -377,7 +382,19 @@ Components
   margin-inline: auto;
 }
 .timetable__controls {
-  --max-width: 800px;
+  --max-width: 1200px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  padding-bottom: 3rem;
+}
+@media only screen and (max-width: 768px) {
+  .timetable__controls {
+    grid-template-columns: 1fr;
+  }
+}
+.timetable__button-container {
   justify-content: center;
 }
 .timetable__body {
@@ -437,7 +454,7 @@ Components
   display: none;
 }
 .activity--dropzone {
-  background-color: color-mix(in srgb, var(--_clr-dropzone, rebeccapurple), gray 30%);
+  background-color: color-mix(in srgb, var(--_clr-dropzone, rebeccapurple), gray 50%);
   border-radius: 6px;
 }
 .activity.activity--dropzone {

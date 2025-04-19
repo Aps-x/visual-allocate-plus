@@ -250,7 +250,7 @@ Components
     }
 }
 .button {
-    --_btn-clr-bg: hsl(0deg 0% 90%);
+    --_btn-clr-bg: var(--clr-grey-light);
     --_btn-clr-txt: var(--clr-navy);
     --_btn-fw: var(--fw-semi-bold);
     display: block;
@@ -261,8 +261,13 @@ Components
     cursor: pointer;
     outline-offset: 4px;
     transition: filter 250ms;
-    width: fit-content;
+    max-width: fit-content;
     &--delete {
+        --_btn-clr-txt: var(--clr-white);
+        @include text-outline();
+    }
+    &--toggle {
+        --_btn-clr-bg: var(--clr-blue);
         --_btn-clr-txt: var(--clr-white);
         @include text-outline();
     }
@@ -387,7 +392,17 @@ Components
     width: min(100%, 1920px);
     margin-inline: auto;
     &__controls {
-        --max-width: 800px;
+        --max-width: 1200px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        align-items: end;
+        padding-bottom: 3rem;
+        @media only screen and (max-width: $breakpoint-tablet) {
+            grid-template-columns: 1fr;
+        }
+    }
+    &__button-container {
         justify-content: center;
     }
     &__body {
@@ -399,8 +414,7 @@ Components
         }
     }
     &__column {
-        // Post-refactor, the activity-container could act as the grid
-        // but I think this is fine how it is...
+        // I can't wait for masonry / item flow
         position: relative;
         display: grid;
         grid-auto-flow: column dense;
@@ -457,7 +471,7 @@ Components
         display: none;
     }
     &--dropzone {
-        background-color: color-mix(in srgb, var(--_clr-dropzone, rebeccapurple), gray 30%);
+        background-color: color-mix(in srgb, var(--_clr-dropzone, rebeccapurple), gray 50%);
         border-radius: 6px;
     }
     &.activity--dropzone {
@@ -515,6 +529,9 @@ Pages
 ========================================================================== */
 .section-transition {
     width: 100vw;
+}
+.delete_activity_btn_container {
+
 }
 /* ==========================================================================
 Layout

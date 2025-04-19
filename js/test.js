@@ -6,7 +6,8 @@ const INPUT_SUBJECT_NAME = document.getElementById("input_subject_name");
 const TEXTAREA_ACTIVITY_DETAILS = document.getElementById("textarea_activity_details");
 const BUTTON_SUBMIT_USER_INPUT = document.getElementById("button_submit_user_input");
 
-const TIMETABLE_CONTROLS = document.getElementById("timetable_controls");
+const BUTTON_ACTIVITY_TOGGLE = document.getElementById("button_activity_toggle");
+const BUTTON_CONTAINER = document.getElementById("button_container");
 
 const INVISIBLE_IMAGE = new Image();
 INVISIBLE_IMAGE.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMSIgaGVpZ2h0PSIxIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=";
@@ -74,11 +75,39 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
     }
     // More input validation would be nice... too bad!
 
-    new Subject(INPUT_SUBJECT_NAME.value, activity_details);
+    // Create subject and register it
+    const new_subject = new Subject(INPUT_SUBJECT_NAME.value, activity_details);
+    SUBJECT_CONTROLLER.Register_New_Subject(new_subject);
 
     FORM_USER_INPUT.reset();
 });
 
+BUTTON_ACTIVITY_TOGGLE.addEventListener("click", (event) => {
+    event.preventDefault();
+
+    // REFACTOR
+
+    if (BUTTON_ACTIVITY_TOGGLE.getAttribute("aria-pressed") === 'false') {
+        // User wants to see all dropzones
+        SUBJECT_CONTROLLER.Update_User_Preference_For_Dropzone_Visibility(true);
+
+        BUTTON_ACTIVITY_TOGGLE.setAttribute("aria-pressed", true);
+
+        // Set text
+        const button_front = BUTTON_ACTIVITY_TOGGLE.querySelector(".button__front");
+        button_front.textContent = "All timeslots visible: ON";
+    } 
+    else {
+        // User does not want to see all dropzones
+        SUBJECT_CONTROLLER.Update_User_Preference_For_Dropzone_Visibility(false);
+
+        BUTTON_ACTIVITY_TOGGLE.setAttribute("aria-pressed", false);
+
+        // Set text
+        const button_front = BUTTON_ACTIVITY_TOGGLE.querySelector(".button__front");
+        button_front.textContent = "All timeslots visible: OFF";
+    }
+});
 /* ==========================================================================
 Functions
 ========================================================================== */
@@ -126,6 +155,35 @@ function Handle_Invalid_Activity_Input() {
 Classes & Custom Elements
 ========================================================================== */
 //-----------------------------------------------------------------------------
+// Purpose: Last minute hack for controlling all subjects. Responsible for
+//          handling timetable settings and propogating these settings across
+//          all subjects.
+//-----------------------------------------------------------------------------
+class Subject_Controller {
+    constructor() {
+        this.list_of_subjects = []
+        this.dropzone_user_preference = false;
+    }
+
+    Register_New_Subject(subject) {
+        this.list_of_subjects.push(subject);
+
+        subject.Set_Dropzones_Forced_Status(this.dropzone_user_preference);
+    }
+
+    Deregister_Subject(subject) {
+        this.list_of_subjects = this.list_of_subjects.filter(list_item => list_item !== subject);
+    }
+
+    Update_User_Preference_For_Dropzone_Visibility(bool) {
+        this.dropzone_user_preference = bool;
+
+        this.list_of_subjects.forEach(subject => {
+            subject.Set_Dropzones_Forced_Status(this.dropzone_user_preference);
+        });
+    }
+}
+//-----------------------------------------------------------------------------
 // Purpose: The Subject class is responsible for creating and controlling
 //          activities. It also creates cards and listens for card drag events.
 //          Subject does not exist in the DOM.
@@ -134,9 +192,10 @@ class Subject {
     static id_counter = 0;
 
     constructor(subject_name, activity_details) {
-        this.id =       Subject.id_counter;
-        this.name =     subject_name;
-        this.color =    this.Generate_Random_Subject_color();   
+        this.id =               Subject.id_counter;
+        this.name =             subject_name;
+        this.color =            this.Generate_Random_Subject_color();
+        this.dropzones_forced = false;
 
         Subject.id_counter++;
 
@@ -168,6 +227,10 @@ class Subject {
                 this.Create_Card(activity_wc);
             }
         });
+
+        if (this.dropzones_forced) {
+            this.Show_Dropzones();
+        }
     }
 
     Create_Card(activity_wc) {
@@ -182,15 +245,39 @@ class Subject {
 
     Listen_For_Card_Events(card) {
         card.addEventListener("dragstart", (event) => {
-            this.activities_list.forEach(activity => {
-                activity.classList.add("activity--dropzone");
-            });
+            this.Show_Dropzones();
         });
 
         card.addEventListener("dragend", (event) => {
-            this.activities_list.forEach(activity => {
-                activity.classList.remove("activity--dropzone");
-            });
+            this.Hide_Dropzones();
+        });
+    }
+
+    Set_Dropzones_Forced_Status(bool) {
+        this.dropzones_forced = bool;
+
+        if (this.dropzones_forced === true) {
+            this.Show_Dropzones();
+        }
+        else {
+            this.Hide_Dropzones();
+        }
+    }
+
+    Show_Dropzones() {
+        this.activities_list.forEach(activity => {
+            activity.classList.add("activity--dropzone");
+        });
+    }
+
+    Hide_Dropzones() {
+        // Guard statement :: User wants dropzones to always be visible
+        if (this.dropzones_forced) {
+            return;
+        }
+
+        this.activities_list.forEach(activity => {
+            activity.classList.remove("activity--dropzone");
         });
     }
 
@@ -205,24 +292,26 @@ class Subject {
             <span class="button__shadow"></span>
             <span class="button__edge"></span>
             <span class="button__front">
-                Remove ${this.name}
-                <img class="icon" src="img/trash-x.svg" alt="Trash Can">
+                Remove ${this.name}  <img class="icon" src="img/trash-x.svg" alt="Trash Can">
             </span>
          </button>`
         const button = template.content.firstChild;
 
-        button.addEventListener("click", this.Delete_Subject.bind(this));
+        button.addEventListener("click", this.Delete_Subject_Activities.bind(this));
 
-        TIMETABLE_CONTROLS.appendChild(button);
+        BUTTON_CONTAINER.appendChild(button);
     }
 
-    Delete_Subject(event) {
+    Delete_Subject_Activities(event) {
         // Removes the delete subject button and all activity containers
-        event.target.remove();
+        event.currentTarget.remove();
 
         this.activities_list.forEach(activity => {
             activity.remove();
         });
+
+        // Remove reference to this subject
+        SUBJECT_CONTROLLER.Deregister_Subject(this);
     }
 }
 //-----------------------------------------------------------------------------
@@ -367,7 +456,7 @@ class Card extends HTMLElement {
         } = this.activity;
     
         this.innerHTML = `
-            <article class="card__article">
+            <article class="card__article | flow">
                 <h4>${subject_name} ${activity_id}</h4>
     
                 <p>
@@ -386,7 +475,7 @@ class Card extends HTMLElement {
         // Grab a reference to the parent activity
         this.activity = this.closest(".activity");
 
-        // Guard Statement
+        // Guard Statement :: No activity found
         if (this.activity === null || undefined) {
             console.warn("Card could not find activity element");
             return;
@@ -449,10 +538,10 @@ class Card extends HTMLElement {
         const card_rect = this.getBoundingClientRect();
 
         const left = card_rect.left + window.scrollX;
-        const right = document.documentElement.scrollWidth - (card_rect.right + window.scrollX);
+        const top = card_rect.top + window.scrollY;
 
         this.style.setProperty('--_left', `${left}px`);
-        this.style.setProperty('--_right', `${right}px`);
+        this.style.setProperty('--_top', `${top}px`);
     }
 
     Move_Card(event) {
@@ -470,40 +559,12 @@ class Card extends HTMLElement {
         return computed_style.getPropertyValue('padding-left');
     }
 }
-//-----------------------------------------------------------------------------
-// Purpose: Last minute hack for controlling all subjects. Putting this at the
-//          bottom because it sucks.
-//-----------------------------------------------------------------------------
-class Subject_Registry {
-    constructor() {
-        this.list_of_subjects = []
-        this.subjects_visible = true;
-
-        // Grab button from DOM and listen for click
-    }
-
-    // REFACTOR
-    Create_Toggle_Activity_Visibility_Button() {
-        const template = document.createElement("template");
-        template.innerHTML = 
-        `<button class="button" style="--_btn-clr-bg: ${this.color};">
-            <span class="button__shadow"></span>
-            <span class="button__edge"></span>
-            <span class="button__front">
-            </span>
-         </button>`
-        const button = template.content.firstChild;
-
-        button.addEventListener("click", this.Toggle_Activity_Visibility.bind(this));
-
-        TIMETABLE_CONTROLS.appendChild(button);
-    }
-}
 /* ==========================================================================
 Runtime
 ========================================================================== */
+// Custom Elements
 window.customElements.define('card-wc', Card);
 window.customElements.define('activity-wc', Activity);
 
 // Last minute hack
-const subject_registry = new Subject_Registry();
+const SUBJECT_CONTROLLER = new Subject_Controller();
