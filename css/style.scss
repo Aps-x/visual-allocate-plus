@@ -242,12 +242,12 @@ Components
        font-weight: var(--fw-bold);
        color: var(--clr-blue);
     }
-    &__demo-container {
-        display: grid;
-        place-content: center;
-        height: 400px;
-        overflow: hidden;
-    }
+}
+.demonstration {
+    display: grid;
+    place-content: center;
+    height: 400px;
+    overflow: hidden;
 }
 .button {
     --_btn-clr-bg: var(--clr-grey-light);

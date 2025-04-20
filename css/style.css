@@ -236,7 +236,8 @@ Components
   font-weight: var(--fw-bold);
   color: var(--clr-blue);
 }
-.help__demo-container {
+
+.demonstration {
   display: grid;
   place-content: center;
   height: 400px;
