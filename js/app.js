@@ -365,13 +365,17 @@ class Activity extends HTMLElement {
     }
 
     Handle_Drop(event) {
-        // // The drop event does not have a reference to what is being dropped :(
-        // // Referencing the card could be achieved multiple different ways.
+        // The drop event does not have a reference to what is being dropped :(
 
-        // // Get the card's subject id using the DataTransfer API
+        // Get the card's subject id using the DataTransfer API
         const card_subject_id = event.dataTransfer.getData("text");
-        // // Select the card from the DOM; drag-in-progress="true" is specified incase 
-        // // this project is refactored to have multiple cards.
+
+        // Guard Statement :: Card and dropzone are not the same subject
+        if (card_subject_id != this.subject_id) {
+            return;
+        }
+
+        // Select the card from the DOM
         const card = document.querySelector(`card-wc[data-subject-id="${card_subject_id}"][drag-in-progress="true"]`);
         
         card.Set_Activity(this);
@@ -482,53 +486,60 @@ class Card extends HTMLElement {
         this.Render();
     }
 
-    Handle_Dragstart(event) {
-        // Use the DataTransfer API to pass the subject-id to the Activity dropzone
-        event.dataTransfer.setData("text/plain", this.getAttribute("data-subject-id"));
+    Calculate_Computed_Style() {
+        //
+    }
 
-        // Offset the card position when being dragged...
-        // Based on where the user clicks on the card.
+    Handle_Dragstart(event) {
+        // The activity dropzone needs a subject id to tell if they are the same subject
+        event.dataTransfer.setData("text/plain", this.getAttribute("data-subject-id"));
+        // Hide native drag image
+        event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
+
+        // Offset from cursor
         const rect = this.getBoundingClientRect();
         this.offset_x = event.clientX - rect.left;
         this.offset_y = event.clientY - rect.top;
 
-        // Card width is set by the grid-parent auto-columns.
-        // Card height and padding are percentage based for responsiveness.
-        // This introduces a problem when the card is moved to the body...
-        // Because percentage is relative to the container.
-        // Convert relative percentage values => absolute pixel values.
-        const card_computed_style = window.getComputedStyle(this);
-        
-        const card_padding = this.Get_Padding_As_Pixels(card_computed_style);
+        // --- WORKAROUND FOR CHROME BUG --- //
+        // https://github.com/react-dnd/react-dnd/issues/1085
+        //
+        // For some reason, changing the styles / attributes of an element during dragstart
+        // cancels a drag operation in chromium. Bruh.
+        setTimeout(() => {
+            // Listen for the card's position over the document
+            this.document_dragover_handler = this.Move_Card.bind(this);
+            document.addEventListener("dragover", this.document_dragover_handler);
 
-        this.style.setProperty('--_width', card_computed_style.width);
-        this.style.setProperty('--_height', card_computed_style.height);
-        this.style.setProperty('--_padding', card_padding);
+            // Card width is set by the grid parent auto-columns.
+            // Card height and padding are percentage based for responsiveness.
+            // This introduces a problem when the card is moved to the body...
+            // Because percentage is relative to the container.
+            // Convert relative percentage values => absolute pixel values.
 
-        // IMPORANT: Must be added after computing the style
-        this.setAttribute("drag-in-progress", "true");
+            this.style.setProperty('--_width', getComputedStyle(this).width);
+            this.style.setProperty('--_height', getComputedStyle(this).height);
+            this.style.setProperty('--_padding', getComputedStyle(this).paddingLeft);
 
-        // Move card to the body
-        document.body.appendChild(this);
-
-        // Listen for the card's position over the document
-        this.document_dragover_handler = this.Move_Card.bind(this);
-        document.addEventListener("dragover", this.document_dragover_handler);
-
-        // Hide native drag image
-        event.dataTransfer.setDragImage(INVISIBLE_IMAGE, 0, 0);
+            // IMPORANT: Must be added after computing the style
+            this.setAttribute("drag-in-progress", "true");
+        }, 0);
     }
 
-    Handle_Dragend(event) {
-        // If the user drags the card over an invalid dropzone then
-        // this.activity will be the Card's previous container.
-        this.activity.appendChild(this);
+    Handle_Dragend() {
+        // --- WORKAROUND FOR CHROME BUG --- //
+        setTimeout(() => {
+            // If the user drags the card over an invalid dropzone then
+            // this.activity will be the Card's previous container.
+            this.activity.appendChild(this);
 
-        this.setAttribute("drag-in-progress", "false");
-        document.removeEventListener("dragover", this.document_dragover_handler);
-        this.Reset_Position();
+            this.setAttribute("drag-in-progress", "false");
 
-        this.Update();
+            document.removeEventListener("dragover", this.document_dragover_handler);
+    
+            this.Reset_Position();
+            this.Update();
+        }, 0);
     }
 
     Reset_Position() {
@@ -542,8 +553,8 @@ class Card extends HTMLElement {
     }
 
     Move_Card(event) {
-        this.style.setProperty('--_left', `${event.pageX - this.offset_x}px`);
-        this.style.setProperty('--_top', `${event.pageY - this.offset_y}px`);
+        this.style.setProperty('--_left', `${event.clientX - this.offset_x}px`);
+        this.style.setProperty('--_top', `${event.clientY - this.offset_y}px`);
     }
 
     Set_Activity(activity) {
@@ -551,10 +562,6 @@ class Card extends HTMLElement {
         this.activity = activity;
     }
 
-    Get_Padding_As_Pixels(computed_style) {
-        // Padding should be even on all sides
-        return computed_style.getPropertyValue('padding-left');
-    }
 }
 /* ==========================================================================
 Runtime

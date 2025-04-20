@@ -488,7 +488,7 @@ Components
   height: 100%;
 }
 .card[drag-in-progress=true] {
-  position: absolute;
+  position: fixed;
   z-index: 9999;
   opacity: 0.9;
   scale: var(--_card-active-scale);

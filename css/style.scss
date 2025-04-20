@@ -504,7 +504,7 @@ Components
     }
     &[drag-in-progress="true"] {
         // Constants
-        position: absolute;
+        position: fixed;
         z-index: 9999;
         opacity: 0.9;
         scale: var(--_card-active-scale);
