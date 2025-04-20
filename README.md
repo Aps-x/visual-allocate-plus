@@ -1,4 +1,5 @@
 # Visual Allocate+
+Currently doesn't work on Chrome :(
 [Website Link](https://aps-x.github.io/visual-allocate-plus/index.html)
 
 Visual Allocate+ is a drag-and-drop timetable planner to help students plan their timetable in a more intuitive way in comparison to Allocate+'s table formatting. Students have to manually copy/paste Allocate+ information into the website, which is more tedious than scraping the info from UC, however this also allows students from ANY university to use this website, and I believe this is worthwhile.
