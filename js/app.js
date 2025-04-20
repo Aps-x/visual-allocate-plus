@@ -422,8 +422,7 @@ class Card extends HTMLElement {
     }
 
     connectedCallback() {
-        // Guard Statement :: The card will be removed and appended multiple times
-        // which can cause connectedCallback() to invoke repeatedly
+        // Guard Statement :: I think this is obselete now, but I am leaving it anyway
         if (this.connected) {
             return;
         }
@@ -484,10 +483,6 @@ class Card extends HTMLElement {
 
         // Render HTML
         this.Render();
-    }
-
-    Calculate_Computed_Style() {
-        //
     }
 
     Handle_Dragstart(event) {
