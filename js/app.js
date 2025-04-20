@@ -502,7 +502,7 @@ class Card extends HTMLElement {
         // Convert relative percentage values => absolute pixel values.
         const card_computed_style = window.getComputedStyle(this);
         
-        const card_padding = Get_Padding_As_Pixels(card_computed_style);
+        const card_padding = this.Get_Padding_As_Pixels(card_computed_style);
 
         this.style.setProperty('--_width', card_computed_style.width);
         this.style.setProperty('--_height', card_computed_style.height);
