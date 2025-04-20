@@ -1,0 +1,10 @@
+ 	Activity 	Day 	Time 	Free 	Campus 	Location 	Duration 	Weeks 	Description
+	01 	Tue 	13:30 	10 	BRUCE 	Building 7 Level C Room 41 - Design Lab 1 (18 Mac and 4 BYOD) 	2 hrs 	13/2-19/3, 2/4-16/4, 30/4 	Introduction to Interaction Design/ON-CAMPUS/BRUCE/11655
+	02 	Tue 	15:30 	10 	BRUCE 	Building 7 Level C Room 41 - Design Lab 1 (18 Mac and 4 BYOD) 	2 hrs 	13/2-19/3, 2/4-16/4, 30/4 	Introduction to Interaction Design/ON-CAMPUS/BRUCE/11655
+	03 	Wed 	10:30 	5 	BRUCE 	Building 7 Level C Room 41 - Design Lab 1 (18 Mac and 4 BYOD) 	2 hrs 	14/2-20/3, 3/4-17/4, 1/5 	Introduction to Interaction Design/ON-CAMPUS/BRUCE/11655
+	04 	Wed 	13:30 	0 	BRUCE 	Building 7 Level C Room 41 - Design Lab 1 (18 Mac and 4 BYOD) 	2 hrs 	14/2-20/3, 10/4-1/5 	Introduction to Interaction Design/ON-CAMPUS/BRUCE/11655
+	05 	Wed 	15:30 	3 	BRUCE 	Building 7 Level C Room 41 - Design Lab 1 (18 Mac and 4 BYOD) 	2 hrs 	14/2-20/3, 3/4-17/4, 1/5 	Introduction to Interaction Design/ON-CAMPUS/BRUCE/11655
+
+
+
+

@@ -85,8 +85,6 @@ BUTTON_SUBMIT_USER_INPUT.addEventListener("click", (event) => {
 BUTTON_ACTIVITY_TOGGLE.addEventListener("click", (event) => {
     event.preventDefault();
 
-    // REFACTOR
-
     if (BUTTON_ACTIVITY_TOGGLE.getAttribute("aria-pressed") === 'false') {
         // User wants to see all dropzones
         SUBJECT_CONTROLLER.Update_User_Preference_For_Dropzone_Visibility(true);
@@ -186,7 +184,6 @@ class Subject_Controller {
 //-----------------------------------------------------------------------------
 // Purpose: The Subject class is responsible for creating and controlling
 //          activities. It also creates cards and listens for card drag events.
-//          Subject does not exist in the DOM.
 //-----------------------------------------------------------------------------
 class Subject {
     static id_counter = 0;
