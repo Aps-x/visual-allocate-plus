@@ -279,10 +279,17 @@ class Subject {
     }
 
     Generate_Random_Subject_color() {
-        return `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`;
+        const hue = Math.floor(Math.random() * 360); // full spectrum
+        const saturation = 70 + Math.random() * 30; // 70% - 100%
+        const lightness = 50 + Math.random() * 10; // 50% - 60%
+    
+        return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
     }
 
     Create_Delete_Subject_Button() {
+        // Can't set innerHTML directly on the container because that would remove all
+        // existing buttons. This method using a template allows us to create a DOM node
+        // that can be appended.
         const template = document.createElement("template");
         template.innerHTML = 
         `<button class="button | button--delete" style="--_btn-clr-bg: ${this.color};">
@@ -368,7 +375,7 @@ class Activity extends HTMLElement {
         // The drop event does not have a reference to what is being dropped :(
 
         // Get the card's subject id using the DataTransfer API
-        const card_subject_id = event.dataTransfer.getData("text");
+        const card_subject_id = event.dataTransfer.getData("text/plain");
 
         // Guard Statement :: Card and dropzone are not the same subject
         if (card_subject_id != this.subject_id) {
@@ -426,6 +433,7 @@ class Card extends HTMLElement {
         if (this.connected) {
             return;
         }
+
         this.connected = true;
         console.log("Card connected");
 
@@ -442,19 +450,26 @@ class Card extends HTMLElement {
         this.setAttribute("draggable", "true");
         this.style.setProperty("--_clr-card", subject.color);
 
-        this.Update();
+        this.Sync_Card_With_Activity();
+    }
+
+    Sync_Card_With_Activity() {
+        // Grab a reference to the parent activity
+        this.activity = this.closest(".activity");
+
+        // Guard Statement :: No activity found
+        if (this.activity === null || undefined) {
+            console.warn("Card could not find activity element");
+            return;
+        }
+
+        this.Render();
     }
 
     Render() {
-        const {
-            subject_name,
-            activity_id,
-            start_time,
-            end_time,
-            location,
-            spaces
-        } = this.activity;
-    
+        // Activity info required to render the card
+        const { subject_name, activity_id, start_time, end_time, location, spaces } = this.activity;
+        
         this.innerHTML = `
             <article class="card__article | flow">
                 <h4>${subject_name} ${activity_id}</h4>
@@ -471,21 +486,24 @@ class Card extends HTMLElement {
         `;
     }
 
-    Update() {
-        // Grab a reference to the parent activity
-        this.activity = this.closest(".activity");
+    Measure_Computed_Style() {
+        // Grid parent auto-columns determine card width.
+        // Card height and padding are percentage based for responsiveness.
 
-        // Guard Statement :: No activity found
-        if (this.activity === null || undefined) {
-            console.warn("Card could not find activity element");
-            return;
-        }
+        // This introduces a problem when the card's position is set to fixed because
+        // the card's width, height, and padding are determined by its container
 
-        // Render HTML
-        this.Render();
+        // Convert relative percentage values => absolute pixel values.
+        const style = getComputedStyle(this);
+
+        this.computed_width = style.width;
+        this.computed_height = style.height;
+        this.computed_padding = style.paddingLeft;
     }
 
     Handle_Dragstart(event) {
+        this.Measure_Computed_Style();
+
         // The activity dropzone needs a subject id to tell if they are the same subject
         event.dataTransfer.setData("text/plain", this.getAttribute("data-subject-id"));
         // Hide native drag image
@@ -506,17 +524,11 @@ class Card extends HTMLElement {
             this.document_dragover_handler = this.Move_Card.bind(this);
             document.addEventListener("dragover", this.document_dragover_handler);
 
-            // Card width is set by the grid parent auto-columns.
-            // Card height and padding are percentage based for responsiveness.
-            // This introduces a problem when the card is moved to the body...
-            // Because percentage is relative to the container.
-            // Convert relative percentage values => absolute pixel values.
+            // Computed values from Measure_Computed_Style();
+            this.style.setProperty('--_width', this.computed_width);
+            this.style.setProperty('--_height', this.computed_height);
+            this.style.setProperty('--_padding', this.computed_padding);
 
-            this.style.setProperty('--_width', getComputedStyle(this).width);
-            this.style.setProperty('--_height', getComputedStyle(this).height);
-            this.style.setProperty('--_padding', getComputedStyle(this).paddingLeft);
-
-            // IMPORANT: Must be added after computing the style
             this.setAttribute("drag-in-progress", "true");
         }, 0);
     }
@@ -529,19 +541,18 @@ class Card extends HTMLElement {
             this.activity.appendChild(this);
 
             this.setAttribute("drag-in-progress", "false");
-
             document.removeEventListener("dragover", this.document_dragover_handler);
     
             this.Reset_Position();
-            this.Update();
+            this.Sync_Card_With_Activity();
         }, 0);
     }
 
     Reset_Position() {
         const card_rect = this.getBoundingClientRect();
 
-        const left = card_rect.left + window.scrollX;
-        const top = card_rect.top + window.scrollY;
+        const left = card_rect.left;
+        const top = card_rect.top;
 
         this.style.setProperty('--_left', `${left}px`);
         this.style.setProperty('--_top', `${top}px`);
@@ -556,7 +567,6 @@ class Card extends HTMLElement {
         // Called by Activity
         this.activity = activity;
     }
-
 }
 /* ==========================================================================
 Runtime
