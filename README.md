@@ -4,6 +4,8 @@
 
 Visual Allocate+ is a drag-and-drop timetable planner to help students plan their timetable in a more intuitive way in comparison to Allocate+'s table formatting. Students have to manually copy/paste Allocate+ information into the website, which is more tedious than scraping the info from UC, however this also allows students from ANY university to use this website, and I believe this is worthwhile.
 
+![Image](https://github.com/user-attachments/assets/63951f66-d159-4cc9-878b-673c89f23a3f)
+
 This website is made using web components and vanilla Javascript. I am not a luddite, rather I was given the advice that I should understand the fundamentals of the web before diving into frameworks, because frameworks may have breaking updates or fall out of fashion, but the foundations they were built on won’t change.
 
 Web components are just OK; I found the shadow DOM to not be worth the hassle. It was still an excellent way of having an object with methods and properties exist in the DOM.
